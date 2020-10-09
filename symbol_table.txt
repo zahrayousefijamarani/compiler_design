@@ -1,0 +1,12 @@
+switch
+default
+while
+void
+return
+break
+if
+case
+main
+int
+else
+a
