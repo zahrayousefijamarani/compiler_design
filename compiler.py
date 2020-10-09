@@ -1,10 +1,17 @@
 input_file = ""
 input_index = 0
 lineno = 1  # represent line in code (will be ++ after \n)
-symbol_table = {"if", "else", "void", "int", "while", "break", "switch", "default", "case", "return"}
+symbol_table = ["if", "else", "void", "int", "while", "break", "switch", "default", "case", "return"]
 key_words = ["if", "else", "void", "int", "while", "break", "switch", "default", "case", "return"]
-simple_symbols = [";","," ,":", "[", "]", "(", ")", "{", "}", "+", "-", "<"]
+simple_symbols = [";", ",", ":", "[", "]", "(", ")", "{", "}", "+", "-", "<"]
 whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
+
+
+def handle_error():
+    global input_index
+    input_index += 1
+    # todo handle
+    return
 
 
 def get_next_token():
@@ -16,10 +23,13 @@ def get_next_token():
         return "SYMBOL", token
     if input_file[input_index] == "*":
         input_index += 1
-        if input_index >= len(input_file) or (
-                input_file[input_index] != "/" and is_in_language(input_file[input_index])):
+        if input_index >= len(input_file):
             return "SYMBOL", "*"
-        # todo else lexical error
+        if input_file[input_index] != "/" and is_in_language(input_file[input_index]):
+            return "SYMBOL", "*"
+        else:
+            handle_error()
+            return
 
     elif input_file[input_index] == "=":
         input_index += 1
@@ -41,7 +51,9 @@ def get_next_token():
                 return "NUM", token
         if not is_letter(input_file[input_index]) and is_in_language(input_file[input_index]):
             return "NUM", token
-        # todo else:   lexical error like 123d
+        else:
+            handle_error()
+            return  # lexical error like 123d
 
     # ------------------- recognizing ID AND KEYWORD -------------------------------------------
     elif is_letter(input_file[input_index]):
@@ -55,7 +67,9 @@ def get_next_token():
                     return return_keyword_id(token)
         if is_in_language(input_file[input_index]):
             return return_keyword_id(token)
-        # todo else lexical error
+        else:
+            handle_error()
+            return  # lexical error
 
     # ------------------- recognizing WHITESPACE -------------------------------------------
     elif input_file[input_index] in whitespaces:
@@ -98,28 +112,30 @@ def get_next_token():
                             token += input_file[input_index]
                             input_index += 1
                             if input_index >= len(input_file):
-                                return  # todo return error
+                                handle_error()
+                                return  # return error
                         while input_file[input_index] == "*":
                             seen_star = True
                             token += input_file[input_index]
                             input_index += 1
                             if input_index >= len(input_file):
-                                return  # todo return error
-
-        # todo else lexical error
+                                handle_error()
+                                return  # return error
+    handle_error()
 
 
 def return_keyword_id(token):
     if token in key_words:
         return "KEYWORD", token
     else:
-        symbol_table.add(token)
+        if token not in symbol_table:
+            symbol_table.append(token)
         return "ID", token
 
 
 def is_in_language(character):
-    if is_digit(character) or is_letter(character) or\
-            (character in simple_symbols) or (character in ["=","*","/"])\
+    if is_digit(character) or is_letter(character) or \
+            (character in simple_symbols) or (character in ["=", "*", "/"]) \
             or (character in whitespaces):
         return True
     return False
@@ -160,7 +176,7 @@ def start_func():
                     if lineno != 1:
                         tokens_file.write('\n')
                     tokens_file.write(str(lineno) + ".	")
-                tokens_file.write("(" + token_result[0] + ", " + token_result[1] + ")")
+                tokens_file.write("(" + token_result[0] + ", " + token_result[1] + ") ")
 
     tokens_file.close()
     end_func()
@@ -168,10 +184,9 @@ def start_func():
 
 def end_func():
     symbol_file = open("symbol_table.txt", "w+")
-    symbol_list = list(symbol_table)
-    for i in range(0, len(symbol_list)):
-        symbol_file.write(symbol_list[i])
-        if i != len(symbol_list) - 1:
+    for i in range(0, len(symbol_table)):
+        symbol_file.write(str(i + 1) + ".	" + symbol_table[i])
+        if i != len(symbol_table) - 1:
             symbol_file.write("\n")
     symbol_file.close()
     return
