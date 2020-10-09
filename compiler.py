@@ -106,6 +106,8 @@ def get_next_token():
                     seen_star = False
                     while True:
                         if seen_star and input_file[input_index] == "/":
+                            input_index +=1
+                            token += "/"
                             return "COMMENT", token
                         while input_file[input_index] != "*":
                             seen_star = False
@@ -160,10 +162,11 @@ def start_func():
     file.close()
     tokens_file = open("tokens.txt", "w+")
     seen_next_line = True
+    first_token = True
     while input_index < len(input_file):
         token_result = get_next_token()
         if token_result is not None:
-
+            # print(token_result)
             number_of_next_line = token_result[1].count('\n')
             for i in range(0, number_of_next_line):
                 seen_next_line = True
@@ -173,9 +176,10 @@ def start_func():
             if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
                 if seen_next_line:
                     seen_next_line = False
-                    if lineno != 1:
+                    if not first_token:
                         tokens_file.write('\n')
                     tokens_file.write(str(lineno) + ".	")
+                first_token = False
                 tokens_file.write("(" + token_result[0] + ", " + token_result[1] + ") ")
 
     tokens_file.close()
