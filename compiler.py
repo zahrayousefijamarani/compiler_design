@@ -32,7 +32,7 @@ def get_next_token():
 
         # ------------------- recognizing NUM -------------------------------------------
         elif is_digit(input_file[input_index]):
-            token += input_file[input_index]
+            token = input_file[input_index]
             input_index += 1
             if input_index >= len(input_file):
                 return "NUM", token
@@ -47,7 +47,7 @@ def get_next_token():
 
         # ------------------- recognizing ID AND KEYWORD -------------------------------------------
         elif is_letter(input_file[input_index]):
-            token += input_file[input_index]
+            token = input_file[input_index]
             input_index += 1
             if input_index < len(input_file):
                 while is_letter(input_file[input_index]) or is_digit(input_file[input_index]):
@@ -59,7 +59,7 @@ def get_next_token():
 
         # ------------------- recognizing WHITESPACE -------------------------------------------
         elif input_file[input_index] in whitespaces:
-            token += input_file[input_index]
+            token = input_file[input_index]
             input_index += 1
             if input_index < len(input_file):
                 while input_file[input_index] in whitespaces:
@@ -71,7 +71,7 @@ def get_next_token():
 
         # ------------------- recognizing COMMENT -------------------------------------------
         elif input_file[input_index] == "/":
-            token += input_file[input_index]
+            token = input_file[input_index]
             input_index += 1
             if input_index < len(input_file):
                 if input_file[input_index] == "/":  # // comment
@@ -88,20 +88,22 @@ def get_next_token():
                     token += input_file[input_index]
                     input_index += 1
                     if input_index < len(input_file):
+                        seen_star = False
                         while True:
+                            if seen_star and input_file[input_index] == "/":
+                                return "COMMENT", token
                             while input_file[input_index] != "*":
+                                seen_star = False
                                 token += input_file[input_index]
                                 input_index += 1
                                 if input_index >= len(input_file):
-                                    break  # todo return error
-                            while input_file[input_index] == "*" or input_file[input_index] == "/":
+                                    return  # todo return error
+                            while input_file[input_index] == "*":
+                                seen_star = True
                                 token += input_file[input_index]
-                                if input_file[input_index] == "/":
-                                    input_index += 1
-                                    return "COMMENT", token
                                 input_index += 1
                                 if input_index >= len(input_file):
-                                    break  # todo return error
+                                    return  # todo return error
 
             # todo else lexical error
 
@@ -135,12 +137,13 @@ def start_func():
 
     while input_index < len(input_file):
         token_result = get_next_token()
-        if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
-            tokens_file.write("(" + token_result[0] + "," + token_result[1] + ")")
-        number_of_next_line = token_result[1].count('\n')
-        for i in range(0, number_of_next_line):
-            tokens_file.write('\n')
-            lineno += 1
+        if token_result is not None:
+            if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
+                tokens_file.write("(" + token_result[0] + "," + token_result[1] + ")")
+            number_of_next_line = token_result[1].count('\n')
+            for i in range(0, number_of_next_line):
+                tokens_file.write('\n')
+                lineno += 1
 
     tokens_file.close()
     end_func()
