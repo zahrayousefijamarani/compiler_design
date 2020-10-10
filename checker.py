@@ -15,3 +15,4 @@ def check_file(file_name):
 n = int(input())
 check_file("tokens")
 check_file("symbol_table")
+check_file("lexical_errors")
