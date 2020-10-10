@@ -1,22 +1,49 @@
 input_file = ""
+lexical_errors_file = open("lexical_errors.txt", "w+")
 input_index = 0
 lineno = 1  # represent line in code (will be ++ after \n)
-symbol_table = ["if", "else", "void", "int", "while", "break", "switch", "default", "case", "return"]
-key_words = ["if", "else", "void", "int", "while", "break", "switch", "default", "case", "return"]
+symbol_table = ["if", "else", "void", "int", "while", "break", "switch",
+                "default", "case", "return"]
+key_words = ["if", "else", "void", "int", "while", "break", "switch",
+             "default", "case", "return"]
 simple_symbols = [";", ",", ":", "[", "]", "(", ")", "{", "}", "+", "-", "<"]
 whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
 
 
-def handle_error():
-    global input_index
-    input_index += 1
-    # todo handle
-    return
+class Error:
+    def __init__(self, line_number, error_type, problematic_word):
+        self.line_number = line_number
+        self.error_type = error_type
+        self.problematic_word = problematic_word
+
+
+class ErrorType:
+    INVALID_INPUT = 'Invalid input'
+    UNCLOSED_COMMENT = 'Unclosed comment'
+    UN_MATCH_STAR_BACK_SLASH = 'Unmatched */'
+    INVALID_NUMBER = 'Invalid number'
+
+
+class ErrorHandler:
+    def __init__(self):
+        self.lexical_errors_file = open("lexical_errors.txt", "w+")
+        self.no_error_message = 'There is no lexical error.'
+        self.errors = []
+
+    def close_file(self):
+        self.lexical_errors_file.close()
+
+    def handle_error(self, line_number, error_type, problematic_word):
+        pass
+
+
+error_handler = ErrorHandler()
 
 
 def get_next_token():
     global input_index, input_file
-    # ------------------- recognizing SYMBOL -------------------------------------------
+    # ------------------- recognizing SYMBOL
+    # -------------------------------------------
     if input_file[input_index] in simple_symbols:
         token = input_file[input_index]
         input_index += 1
@@ -25,10 +52,14 @@ def get_next_token():
         input_index += 1
         if input_index >= len(input_file):
             return "SYMBOL", "*"
-        if input_file[input_index] != "/" and is_in_language(input_file[input_index]):
+        if input_file[input_index] != "/":
             return "SYMBOL", "*"
         else:
-            handle_error()
+            error_handler.handle_error(
+                lineno,
+                ErrorType.UN_MATCH_STAR_BACK_SLASH,
+                '*/'
+            )
             return
 
     elif input_file[input_index] == "=":
@@ -38,7 +69,8 @@ def get_next_token():
             return "SYMBOL", "=="
         return "SYMBOL", "="
 
-    # ------------------- recognizing NUM -------------------------------------------
+    # ------------------- recognizing NUM
+    # -------------------------------------------
     elif is_digit(input_file[input_index]):
         token = input_file[input_index]
         input_index += 1
@@ -49,18 +81,25 @@ def get_next_token():
             input_index += 1
             if input_index >= len(input_file):
                 return "NUM", token
-        if not is_letter(input_file[input_index]) and is_in_language(input_file[input_index]):
+        if not is_letter(input_file[input_index]) and is_in_language(
+                input_file[input_index]):
             return "NUM", token
         else:
-            handle_error()
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_NUMBER,
+                token + input_file[input_index]
+            )  # todo 123ddd ?? chi mishe
             return  # lexical error like 123d
 
-    # ------------------- recognizing ID AND KEYWORD -------------------------------------------
+    # ------------------- recognizing ID AND KEYWORD
+    # -------------------------------------------
     elif is_letter(input_file[input_index]):
         token = input_file[input_index]
         input_index += 1
         if input_index < len(input_file):
-            while is_letter(input_file[input_index]) or is_digit(input_file[input_index]):
+            while is_letter(input_file[input_index]) or is_digit(
+                    input_file[input_index]):
                 token += input_file[input_index]
                 input_index += 1
                 if input_index >= len(input_file):
@@ -68,10 +107,15 @@ def get_next_token():
         if is_in_language(input_file[input_index]):
             return return_keyword_id(token)
         else:
-            handle_error()
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_INPUT,
+                token + input_file[input_index]
+            )
             return  # lexical error
 
-    # ------------------- recognizing WHITESPACE -------------------------------------------
+    # ------------------- recognizing WHITESPACE
+    # -------------------------------------------
     elif input_file[input_index] in whitespaces:
         token = input_file[input_index]
         input_index += 1
@@ -83,7 +127,8 @@ def get_next_token():
                     break
         return "WHITESPACE", token
 
-    # ------------------- recognizing COMMENT -------------------------------------------
+    # ------------------- recognizing COMMENT
+    # -------------------------------------------
     elif input_file[input_index] == "/":
         # todo - comment can contain any character??????
         token = input_file[input_index]
@@ -106,7 +151,7 @@ def get_next_token():
                     seen_star = False
                     while True:
                         if seen_star and input_file[input_index] == "/":
-                            input_index +=1
+                            input_index += 1
                             token += "/"
                             return "COMMENT", token
                         while input_file[input_index] != "*":
@@ -114,16 +159,36 @@ def get_next_token():
                             token += input_file[input_index]
                             input_index += 1
                             if input_index >= len(input_file):
-                                handle_error()
+                                error_handler.handle_error(
+                                    lineno,
+                                    ErrorType.UNCLOSED_COMMENT,
+                                    token
+                                )
                                 return  # return error
                         while input_file[input_index] == "*":
                             seen_star = True
                             token += input_file[input_index]
                             input_index += 1
                             if input_index >= len(input_file):
-                                handle_error()
+                                error_handler.handle_error(
+                                    lineno,
+                                    ErrorType.UNCLOSED_COMMENT,
+                                    token
+                                )
                                 return  # return error
-    handle_error()
+                else:
+                    error_handler.handle_error(
+                        lineno,
+                        ErrorType.UNCLOSED_COMMENT,
+                        token
+                    )
+                    return  # return error
+
+    error_handler.handle_error(
+        input_index,
+        ErrorType.INVALID_INPUT,
+        input_file[input_index]
+    )
 
 
 def return_keyword_id(token):
@@ -148,7 +213,8 @@ def is_digit(character):
 
 
 def is_letter(character):
-    return ord('a') <= ord(character) <= ord('z') or ord('A') <= ord(character) <= ord('Z')
+    return ord('a') <= ord(character) <= ord('z') or ord('A') <= ord(
+        character) <= ord('Z')
 
 
 def start_func():
@@ -156,7 +222,8 @@ def start_func():
     try:
         file = open("input.txt", "r")
         input_file = file.read()
-    except:  # if input.txt does not found
+    except FileNotFoundError:
+        print("input file not found!")
         end_func()
         return
     file.close()
@@ -168,19 +235,21 @@ def start_func():
         if token_result is not None:
             # print(token_result)
             number_of_next_line = token_result[1].count('\n')
-            for i in range(0, number_of_next_line):
+            for i in range(number_of_next_line):
                 seen_next_line = True
                 # tokens_file.write('\n')
                 lineno += 1
 
-            if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
+            if token_result[0] != "WHITESPACE" and \
+                    token_result[0] != "COMMENT":
                 if seen_next_line:
                     seen_next_line = False
                     if not first_token:
                         tokens_file.write('\n')
                     tokens_file.write(str(lineno) + ".	")
                 first_token = False
-                tokens_file.write("(" + token_result[0] + ", " + token_result[1] + ") ")
+                tokens_file.write(
+                    "(" + token_result[0] + ", " + token_result[1] + ") ")
 
     tokens_file.close()
     end_func()
@@ -193,6 +262,7 @@ def end_func():
         if i != len(symbol_table) - 1:
             symbol_file.write("\n")
     symbol_file.close()
+    error_handler.close_file()
     return
 
 
