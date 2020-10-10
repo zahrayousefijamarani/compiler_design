@@ -10,13 +10,6 @@ simple_symbols = [";", ",", ":", "[", "]", "(", ")", "{", "}", "+", "-", "<"]
 whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
 
 
-class Error:
-    def __init__(self, line_number, error_type, problematic_word):
-        self.line_number = line_number
-        self.error_type = error_type
-        self.problematic_word = problematic_word
-
-
 class ErrorType:
     INVALID_INPUT = 'Invalid input'
     UNCLOSED_COMMENT = 'Unclosed comment'
@@ -28,13 +21,18 @@ class ErrorHandler:
     def __init__(self):
         self.lexical_errors_file = open("lexical_errors.txt", "w+")
         self.no_error_message = 'There is no lexical error.'
-        self.errors = []
+        self.is_exist_error = False
 
     def close_file(self):
+        if not self.is_exist_error:
+            self.lexical_errors_file.write(self.no_error_message)
         self.lexical_errors_file.close()
 
     def handle_error(self, line_number, error_type, problematic_word):
-        pass
+        self.is_exist_error = True
+        self.lexical_errors_file.write(
+            f'{line_number} . ({problematic_word, error_type})'
+        )
 
 
 error_handler = ErrorHandler()
@@ -162,7 +160,7 @@ def get_next_token():
                                 error_handler.handle_error(
                                     lineno,
                                     ErrorType.UNCLOSED_COMMENT,
-                                    token
+                                    token[:7] + '...'
                                 )
                                 return  # return error
                         while input_file[input_index] == "*":
@@ -173,14 +171,14 @@ def get_next_token():
                                 error_handler.handle_error(
                                     lineno,
                                     ErrorType.UNCLOSED_COMMENT,
-                                    token
+                                    token[:7] + '...'
                                 )
                                 return  # return error
                 else:
                     error_handler.handle_error(
                         lineno,
                         ErrorType.UNCLOSED_COMMENT,
-                        token
+                        token[:7] + '...'
                     )
                     return  # return error
 
