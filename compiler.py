@@ -123,6 +123,8 @@ def get_next_token():
                             if input_index >= len(input_file):
                                 handle_error()
                                 return  # return error
+            else:
+                input_index -= 1
     handle_error()
 
 
@@ -167,11 +169,14 @@ def start_func():
         token_result = get_next_token()
         if token_result is not None:
             # print(token_result)
+            # print(lineno)
             number_of_next_line = token_result[1].count('\n')
             for i in range(0, number_of_next_line):
                 seen_next_line = True
                 # tokens_file.write('\n')
                 lineno += 1
+
+            # print(str(lineno) + " after")
 
             if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
                 if seen_next_line:
