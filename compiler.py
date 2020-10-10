@@ -181,7 +181,8 @@ def get_next_token():
                         token[:7] + '...'
                     )
                     return  # return error
-
+            else:
+                input_index -= 1
     error_handler.handle_error(
         input_index,
         ErrorType.INVALID_INPUT,
@@ -232,14 +233,14 @@ def start_func():
         token_result = get_next_token()
         if token_result is not None:
             # print(token_result)
+            # print(lineno)
             number_of_next_line = token_result[1].count('\n')
             for i in range(number_of_next_line):
                 seen_next_line = True
                 # tokens_file.write('\n')
                 lineno += 1
-
-            if token_result[0] != "WHITESPACE" and \
-                    token_result[0] != "COMMENT":
+            if token_result[0] != "WHITESPACE" and token_result[
+                0] != "COMMENT":
                 if seen_next_line:
                     seen_next_line = False
                     if not first_token:
