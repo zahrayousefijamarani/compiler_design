@@ -10,6 +10,6 @@
 10.	return
 11.	f
 12.	a
-13.	main
+13.	g
 14.	b
-15.	continue
+15.	output
