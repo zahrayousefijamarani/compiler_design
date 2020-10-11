@@ -1,8 +1,1 @@
-void main(int a){
-int a=0;
-//comment
-a=2+2;
-/* ffgfs int void
-*/
-return a;
-}
+out$put£(a);

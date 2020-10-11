@@ -22,6 +22,7 @@ class ErrorHandler:
         self.lexical_errors_file = open("lexical_errors.txt", "w+")
         self.no_error_message = 'There is no lexical error.'
         self.is_exist_error = False
+        self.last_line = 0
 
     def close_file(self):
         if not self.is_exist_error:
@@ -29,10 +30,17 @@ class ErrorHandler:
         self.lexical_errors_file.close()
 
     def handle_error(self, line_number, error_type, problematic_word):
+        global input_index
+        print(problematic_word)
         self.is_exist_error = True
-        self.lexical_errors_file.write(
-            f'{line_number} . ({problematic_word, error_type})'
-        )
+        if self.last_line != line_number:
+            if self.last_line != 0:
+                self.lexical_errors_file.write('\n')
+            self.last_line = line_number
+            self.lexical_errors_file.write(str(line_number) + ".	(" + problematic_word + ", " + error_type + ")")
+        else:
+            self.lexical_errors_file.write(" (" + problematic_word + ", " + error_type + ")")
+        input_index += 1
 
 
 error_handler = ErrorHandler()
@@ -79,6 +87,7 @@ def get_next_token():
             input_index += 1
             if input_index >= len(input_file):
                 return "NUM", token
+        # todo asked in slack
         if not is_letter(input_file[input_index]) and is_in_language(
                 input_file[input_index]):
             return "NUM", token
@@ -102,15 +111,17 @@ def get_next_token():
                 input_index += 1
                 if input_index >= len(input_file):
                     return return_keyword_id(token)
-        if is_in_language(input_file[input_index]):
-            return return_keyword_id(token)
+            if is_in_language(input_file[input_index]):
+                return return_keyword_id(token)
+            else:
+                error_handler.handle_error(
+                    lineno,
+                    ErrorType.INVALID_INPUT,
+                    token + input_file[input_index]
+                )
+                return  # lexical error
         else:
-            error_handler.handle_error(
-                lineno,
-                ErrorType.INVALID_INPUT,
-                token + input_file[input_index]
-            )
-            return  # lexical error
+            return return_keyword_id(token)
 
     # ------------------- recognizing WHITESPACE
     # -------------------------------------------
@@ -128,7 +139,6 @@ def get_next_token():
     # ------------------- recognizing COMMENT
     # -------------------------------------------
     elif input_file[input_index] == "/":
-        # todo - comment can contain any character??????
         token = input_file[input_index]
         input_index += 1
         if input_index < len(input_file):
@@ -181,10 +191,10 @@ def get_next_token():
                         token[:7] + '...'
                     )
                     return  # return error
-            else:
+            elif input_file[input_index] == '\n':
                 input_index -= 1
     error_handler.handle_error(
-        input_index,
+        lineno,
         ErrorType.INVALID_INPUT,
         input_file[input_index]
     )
@@ -234,13 +244,13 @@ def start_func():
         if token_result is not None:
             # print(token_result)
             # print(lineno)
+            # print(input_index)
             number_of_next_line = token_result[1].count('\n')
             for i in range(number_of_next_line):
                 seen_next_line = True
                 # tokens_file.write('\n')
                 lineno += 1
-            if token_result[0] != "WHITESPACE" and token_result[
-                0] != "COMMENT":
+            if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
                 if seen_next_line:
                     seen_next_line = False
                     if not first_token:
