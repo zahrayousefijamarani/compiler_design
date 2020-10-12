@@ -87,16 +87,14 @@ def get_next_token():
             input_index += 1
             if input_index >= len(input_file):
                 return "NUM", token
-        # todo asked in slack
-        if not is_letter(input_file[input_index]) and is_in_language(
-                input_file[input_index]):
+        if not is_letter(input_file[input_index]):
             return "NUM", token
         else:
             error_handler.handle_error(
                 lineno,
                 ErrorType.INVALID_NUMBER,
                 token + input_file[input_index]
-            )  # todo 123ddd ?? chi mishe
+            )
             return  # lexical error like 123d
 
     # ------------------- recognizing ID AND KEYWORD
