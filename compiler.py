@@ -13,7 +13,7 @@ whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
 class ErrorType:
     INVALID_INPUT = 'Invalid input'
     UNCLOSED_COMMENT = 'Unclosed comment'
-    UN_MATCH_STAR_BACK_SLASH = 'Unmatched */'
+    UN_MATCH_COMMENT = 'Unmatched comment'
     INVALID_NUMBER = 'Invalid number'
 
 
@@ -65,7 +65,7 @@ def get_next_token():
         else:
             error_handler.handle_error(
                 lineno,
-                ErrorType.UN_MATCH_STAR_BACK_SLASH,
+                ErrorType.UN_MATCH_COMMENT,
                 '*/'
             )
             return

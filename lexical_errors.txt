@@ -1,3 +1,1 @@
-2.	(*/, Unmatched */)
-13.	(/, Invalid input)
-16.	(/*void ..., Unclosed comment)
+There is no lexical error.
