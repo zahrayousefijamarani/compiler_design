@@ -31,15 +31,17 @@ class ErrorHandler:
 
     def handle_error(self, line_number, error_type, problematic_word):
         global input_index
-        print(problematic_word)
+        # print(problematic_word)
         self.is_exist_error = True
         if self.last_line != line_number:
             if self.last_line != 0:
                 self.lexical_errors_file.write('\n')
             self.last_line = line_number
-            self.lexical_errors_file.write(str(line_number) + ".	(" + problematic_word + ", " + error_type + ")")
+            self.lexical_errors_file.write(str(
+                line_number) + ".	(" + problematic_word + ", " + error_type + ")")
         else:
-            self.lexical_errors_file.write(" (" + problematic_word + ", " + error_type + ")")
+            self.lexical_errors_file.write(
+                " (" + problematic_word + ", " + error_type + ")")
         input_index += 1
 
 
@@ -226,10 +228,11 @@ def is_letter(character):
         character) <= ord('Z')
 
 
-def start_func():
+def start_func(input_file_name="input.txt"):
+    print("START COMPILE!")
     global input_file, lineno
     try:
-        file = open("input.txt", "r")
+        file = open(input_file_name, "r")
         input_file = file.read()
     except FileNotFoundError:
         print("input file not found!")
@@ -242,15 +245,12 @@ def start_func():
     while input_index < len(input_file):
         token_result = get_next_token()
         if token_result is not None:
-            # print(token_result)
-            # print(lineno)
-            # print(input_index)
             number_of_next_line = token_result[1].count('\n')
             for i in range(number_of_next_line):
                 seen_next_line = True
-                # tokens_file.write('\n')
                 lineno += 1
-            if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
+            if token_result[0] != "WHITESPACE" and token_result[
+                0] != "COMMENT":
                 if seen_next_line:
                     seen_next_line = False
                     if not first_token:
@@ -272,7 +272,7 @@ def end_func():
             symbol_file.write("\n")
     symbol_file.close()
     error_handler.close_file()
+    print("END COMPILE!")
     return
 
-
-start_func()
+# start_func()

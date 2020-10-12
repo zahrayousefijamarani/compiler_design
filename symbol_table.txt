@@ -8,4 +8,8 @@
 8.	default
 9.	case
 10.	return
-11.	a
+11.	f
+12.	a
+13.	g
+14.	b
+15.	output
