@@ -1,3 +1,5 @@
+# zahra yousefi jamarani  97102717
+# reza amini majd 97101275
 input_file = ""
 lexical_errors_file = open("lexical_errors.txt", "w+")
 input_index = 0
