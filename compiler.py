@@ -60,6 +60,13 @@ def get_next_token():
         input_index += 1
         if input_index >= len(input_file):
             return "SYMBOL", "*"
+        if not is_in_language(input_file[input_index]):
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_INPUT,
+                "*" + input_file[input_index]
+            )
+            return
         if input_file[input_index] != "/":
             return "SYMBOL", "*"
         else:
@@ -75,7 +82,15 @@ def get_next_token():
         if input_index < len(input_file) and input_file[input_index] == "=":
             input_index += 1
             return "SYMBOL", "=="
-        return "SYMBOL", "="
+        if is_in_language(input_file[input_index]):
+            return "SYMBOL", "="
+        else:
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_INPUT,
+                "=" + input_file[input_index]
+            )
+            return
 
     # ------------------- recognizing NUM
     # -------------------------------------------
@@ -89,6 +104,13 @@ def get_next_token():
             input_index += 1
             if input_index >= len(input_file):
                 return "NUM", token
+        if not is_in_language(input_file[input_index]):
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_INPUT,
+                token + input_file[input_index]
+            )
+            return
         if not is_letter(input_file[input_index]):
             return "NUM", token
         else:
@@ -227,13 +249,13 @@ def is_letter(character):
 
 
 def start_func(input_file_name="input.txt"):
-    print("START COMPILE!")
+    # print("START COMPILE!")
     global input_file, lineno
     try:
         file = open(input_file_name, "r")
         input_file = file.read()
     except FileNotFoundError:
-        print("input file not found!")
+        # print("input file not found!")
         end_func()
         return
     file.close()
@@ -270,7 +292,8 @@ def end_func():
             symbol_file.write("\n")
     symbol_file.close()
     error_handler.close_file()
-    print("END COMPILE!")
+    # print("END COMPILE!")
     return
 
-# start_func()
+
+start_func()
