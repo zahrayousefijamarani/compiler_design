@@ -1,3 +1,5 @@
+# zahra yousefi jamarani  97102717
+# reza amini majd 97101275
 input_file = ""
 lexical_errors_file = open("lexical_errors.txt", "w+")
 input_index = 0
@@ -13,7 +15,7 @@ whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
 class ErrorType:
     INVALID_INPUT = 'Invalid input'
     UNCLOSED_COMMENT = 'Unclosed comment'
-    UN_MATCH_STAR_BACK_SLASH = 'Unmatched */'
+    UN_MATCH_COMMENT = 'Unmatched comment'
     INVALID_NUMBER = 'Invalid number'
 
 
@@ -31,15 +33,17 @@ class ErrorHandler:
 
     def handle_error(self, line_number, error_type, problematic_word):
         global input_index
-        print(problematic_word)
+        # print(problematic_word)
         self.is_exist_error = True
         if self.last_line != line_number:
             if self.last_line != 0:
                 self.lexical_errors_file.write('\n')
             self.last_line = line_number
-            self.lexical_errors_file.write(str(line_number) + ".	(" + problematic_word + ", " + error_type + ")")
+            self.lexical_errors_file.write(str(
+                line_number) + ".	(" + problematic_word + ", " + error_type + ")")
         else:
-            self.lexical_errors_file.write(" (" + problematic_word + ", " + error_type + ")")
+            self.lexical_errors_file.write(
+                " (" + problematic_word + ", " + error_type + ")")
         input_index += 1
 
 
@@ -58,12 +62,19 @@ def get_next_token():
         input_index += 1
         if input_index >= len(input_file):
             return "SYMBOL", "*"
+        if not is_in_language(input_file[input_index]):
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_INPUT,
+                "*" + input_file[input_index]
+            )
+            return
         if input_file[input_index] != "/":
             return "SYMBOL", "*"
         else:
             error_handler.handle_error(
                 lineno,
-                ErrorType.UN_MATCH_STAR_BACK_SLASH,
+                ErrorType.UN_MATCH_COMMENT,
                 '*/'
             )
             return
@@ -73,7 +84,15 @@ def get_next_token():
         if input_index < len(input_file) and input_file[input_index] == "=":
             input_index += 1
             return "SYMBOL", "=="
-        return "SYMBOL", "="
+        if is_in_language(input_file[input_index]):
+            return "SYMBOL", "="
+        else:
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_INPUT,
+                "=" + input_file[input_index]
+            )
+            return
 
     # ------------------- recognizing NUM
     # -------------------------------------------
@@ -87,6 +106,13 @@ def get_next_token():
             input_index += 1
             if input_index >= len(input_file):
                 return "NUM", token
+        if not is_in_language(input_file[input_index]):
+            error_handler.handle_error(
+                lineno,
+                ErrorType.INVALID_NUMBER,
+                token + input_file[input_index]
+            )
+            return
         if not is_letter(input_file[input_index]):
             return "NUM", token
         else:
@@ -224,13 +250,14 @@ def is_letter(character):
         character) <= ord('Z')
 
 
-def start_func():
+def start_func(input_file_name="input.txt"):
+    # print("START COMPILE!")
     global input_file, lineno
     try:
-        file = open("input.txt", "r")
+        file = open(input_file_name, "r")
         input_file = file.read()
     except FileNotFoundError:
-        print("input file not found!")
+        # print("input file not found!")
         end_func()
         return
     file.close()
@@ -240,15 +267,12 @@ def start_func():
     while input_index < len(input_file):
         token_result = get_next_token()
         if token_result is not None:
-            # print(token_result)
-            # print(lineno)
-            # print(input_index)
             number_of_next_line = token_result[1].count('\n')
             for i in range(number_of_next_line):
                 seen_next_line = True
-                # tokens_file.write('\n')
                 lineno += 1
-            if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
+            if token_result[0] != "WHITESPACE" and token_result[
+                0] != "COMMENT":
                 if seen_next_line:
                     seen_next_line = False
                     if not first_token:
@@ -270,6 +294,7 @@ def end_func():
             symbol_file.write("\n")
     symbol_file.close()
     error_handler.close_file()
+    # print("END COMPILE!")
     return
 
 
