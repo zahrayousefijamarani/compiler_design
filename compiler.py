@@ -50,7 +50,7 @@ class ErrorHandler:
 error_handler = ErrorHandler()
 
 
-def get_next_token():
+def get_next_token_func():
     global input_index, input_file
     # ------------------- recognizing SYMBOL
     # -------------------------------------------
@@ -250,8 +250,21 @@ def is_letter(character):
         character) <= ord('Z')
 
 
+def get_next_token():
+    global lineno
+    if input_index < len(input_file):
+        token_result = get_next_token_func()
+        if token_result is not None:
+            number_of_next_line = token_result[1].count('\n')
+            for i in range(number_of_next_line):
+                lineno += 1
+            if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
+                return token_result
+    else:
+        return "$", "$"
+
+
 def start_func(input_file_name="input.txt"):
-    # print("START COMPILE!")
     global input_file, lineno
     try:
         file = open(input_file_name, "r")
@@ -261,29 +274,14 @@ def start_func(input_file_name="input.txt"):
         end_func()
         return
     file.close()
-    tokens_file = open("tokens.txt", "w+")
-    seen_next_line = True
-    first_token = True
-    while input_index < len(input_file):
-        token_result = get_next_token()
-        if token_result is not None:
-            number_of_next_line = token_result[1].count('\n')
-            for i in range(number_of_next_line):
-                seen_next_line = True
-                lineno += 1
-            if token_result[0] != "WHITESPACE" and token_result[
-                0] != "COMMENT":
-                if seen_next_line:
-                    seen_next_line = False
-                    if not first_token:
-                        tokens_file.write('\n')
-                    tokens_file.write(str(lineno) + ".	")
-                first_token = False
-                tokens_file.write(
-                    "(" + token_result[0] + ", " + token_result[1] + ") ")
 
-    tokens_file.close()
-    end_func()
+    token = get_next_token()
+    while token is None:
+        token = get_next_token()
+    if token[0] == "$":
+        end_func()
+        return
+        # use token
 
 
 def end_func():
@@ -294,7 +292,6 @@ def end_func():
             symbol_file.write("\n")
     symbol_file.close()
     error_handler.close_file()
-    # print("END COMPILE!")
     return
 
 
