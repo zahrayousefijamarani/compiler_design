@@ -12,59 +12,250 @@ simple_symbols = [";", ",", ":", "[", "]", "(", ")", "{", "}", "+", "-", "<"]
 whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
 
 parse_table = {
-    "Program": ["$", "int", "void"],
-    "DeclarationList": ["ε", "int", "void"],
-    "Declaration": ["int", "void"],
-    "DeclarationInitial": ["int", "void"],
-    "DeclarationPrime": ["(", ";", "["],
-    "VarDeclarationPrime": [";", "["],
-    "FunDeclarationPrime": ["("],
-    "TypeSpecifier": ["int", "void"],
-    "Params": ["int", "void"],
-    "ParamListVoidAbtar": ["ID", "ε"],
-    "ParamList": [",", "ε"],
-    "Param": ["int", "void"],
-    "ParamPrime": ["[", "ε"],
-    "CompoundStmt": ["{"],
-    "StatementList": ["ε", "{", "break", ";", "if", "while", "return", "switch", "ID", "+", "-", "(", "NUM"],
-    "Statement": ["{", "break", ";", "if", "while", "return", "switch", "ID", "+", "-", "(", "NUM"],
-    "ExpressionStmt": ["break", ";", "ID", "+", "-", "(", "NUM"],
-    "SelectionStmt": ["if"],
-    "IterationStmt": ["while"],
-    "ReturnStmt": ["return"],
-    "ReturnStmtPrime": [";", "ID", "+", "-", "(", "NUM"],
-    "SwitchStmt": ["switch"],
-    "CaseStmts": ["ε", "case"],
-    "CaseStmt": ["case"],
-    "DefaultStmt": ["default", "ε"],
-    "Expression": ["ID", "+", "-", "(", "NUM"],
-    "B": ["=", "[", "(", "*", "+", "-", "<", "==", "ε"],
-    "H": ["=", "*", "ε", "+", "-", "<", "=="],
-    "SimpleExpressionZegond": ["+", "-", "(", "NUM"],
-    "SimpleExpressionPrime": ["(", "*", "+", "-", "<", "==", "ε"],
-    "C": ["ε", "<", "=="],
-    "Relop": ["<", "=="],
-    "AdditiveExpression": ["+", "-", "(", "ID", "NUM"],
-    "AdditiveExpressionPrime": ["(", "*", "+", "-", "ε"],
-    "AdditiveExpressionZegond": ["+", "-", "(", "NUM"],
-    "D": ["ε", "+", "-"],
-    "Addop": ["+", "-"],
-    "Term": ["+", "-", "(", "ID", "NUM"],
-    "TermPrime": ["(", "*", "ε"],
-    "TermZegond": ["+", "-", "(", "NUM"],
-    "G": ["*", "ε"],
-    "SignedFactor": ["+", "-", "(", "ID", "NUM"],
-    "SignedFactorPrime": ["(", "ε"],
-    "SignedFactorZegond": ["+", "-", "(", "NUM"],
-    "Factor": ["(", "ID", "NUM"],
-    "VarCallPrime": ["(", "[", "ε"],
-    "VarPrime": ["[", "ε"],
-    "FactorPrime": ["(", "ε"],
-    "FactorZegond": ["(", "NUM"],
-    "Args": ["ε", "ID", "+", "-", "(", "NUM"],
-    "ArgList": ["ID", "+", "-", "(", "NUM"],
-    "ArgListPrime": [",", "ε"]
+    ('Program', '$'): ["$"],
+    ('Program', 'int'): ["DeclarationList"],
+    ('Program', 'void'): ["DeclarationList"],
+
+    ('DeclarationList', 'ε'): ["ε"],
+    ('DeclarationList', 'int'): ["Declaration", "DeclarationList"],
+    ('DeclarationList', 'void'): ["Declaration", "DeclarationList"],
+
+    ('Declaration', 'int'): ["DeclarationInitial", "DeclarationPrime"],
+    ('Declaration', 'void'): ["DeclarationInitial", "DeclarationPrime"],
+
+    ('DeclarationInitial', 'int'): ["TypeSpecifier", "ID"],
+    ('DeclarationInitial', 'void'): ["TypeSpecifier", "ID"],
+
+    ('DeclarationPrime', '('): ["FunDeclarationPrime"],
+    ('DeclarationPrime', ';'): ["VarDeclarationPrime"],
+    ('DeclarationPrime', '['): ["VarDeclarationPrime"],
+
+    ('VarDeclarationPrime', ';'): [";"],
+    ('VarDeclarationPrime', '['): ["[", "NUM", "]", ";"],
+
+    ('FunDeclarationPrime', '('): ["(", "Params", ")", "CompoundStmt"],
+
+    ('TypeSpecifier', 'int'): ["int"],
+    ('TypeSpecifier', 'void'): ["void"],
+
+    ('Params', 'int'): ["int", "ID", "ParamPrime", "ParamList"],
+    ('Params', 'void'): ["void", "ParamListVoidAbtar"],
+
+    ('ParamListVoidAbtar', 'ID'): ["ID", "ParamPrime", "ParamList"],
+    ('ParamListVoidAbtar', 'ε'): ["ε"],
+
+    ('ParamList', ','): [",", "Param", "ParamList"],
+    ('ParamList', 'ε'): ["ε"],
+
+    ('Param', 'int'): ["DeclarationInitial", "ParamPrime"],
+    ('Param', 'void'): ["DeclarationInitial", "ParamPrime"],
+
+    ('ParamPrime', '['): ["[", "]"],
+    ('ParamPrime', 'ε'): ["ε"],
+
+    ('CompoundStmt', '{'): ["{", "DeclarationList", "StatementList", "}"],
+
+    ('StatementList', 'ε'): ["ε"],
+    ('StatementList', '{'): ["Statement", "StatementList"],
+    ('StatementList', 'break'): ["Statement", "StatementList"],
+    ('StatementList', ';'): ["Statement", "StatementList"],
+    ('StatementList', 'if'): ["Statement", "StatementList"],
+    ('StatementList', 'while'): ["Statement", "StatementList"],
+    ('StatementList', 'return'): ["Statement", "StatementList"],
+    ('StatementList', 'switch'): ["Statement", "StatementList"],
+    ('StatementList', 'ID'): ["Statement", "StatementList"],
+    ('StatementList', '+'): ["Statement", "StatementList"],
+    ('StatementList', '-'): ["Statement", "StatementList"],
+    ('StatementList', '('): ["Statement", "StatementList"],
+    ('StatementList', 'NUM'): ["Statement", "StatementList"],
+
+    ('Statement', '{'): ["CompoundStmt"],
+    ('Statement', 'break'): ["ExpressionStmt"],
+    ('Statement', ';'): ["ExpressionStmt"],
+    ('Statement', 'if'): ["SelectionStmt"],
+    ('Statement', 'while'): ["IterationStmt"],
+    ('Statement', 'return'): ["ReturnStmt"],
+    ('Statement', 'switch'): ["SwitchStmt"],
+    ('Statement', 'ID'): ["ExpressionStmt"],
+    ('Statement', '+'): ["ExpressionStmt"],
+    ('Statement', '-'): ["ExpressionStmt"],
+    ('Statement', '('): ["ExpressionStmt"],
+    ('Statement', 'NUM'): ["ExpressionStmt"],
+
+    ('ExpressionStmt', 'break'): ["break", ";"],
+    ('ExpressionStmt', ';'): [";"],
+    ('ExpressionStmt', 'ID'): ["Expression", ";"],
+    ('ExpressionStmt', '+'): ["Expression", ";"],
+    ('ExpressionStmt', '-'): ["Expression", ";"],
+    ('ExpressionStmt', '('): ["Expression", ";"],
+    ('ExpressionStmt', 'NUM'): ["Expression", ";"],
+
+    ('SelectionStmt', 'if'): ["if", "(", "Expression", ")", "Statement", "else", "Statement"],
+
+    ('IterationStmt', 'while'): ["while", "(", "Expression", ")", "Statement"],
+
+    ('ReturnStmt', 'return'): ["return", "ReturnStmtPrime"],
+
+    ('ReturnStmtPrime', ';'): [";"],
+    ('ReturnStmtPrime', 'ID'): ["Expression", ";"],
+    ('ReturnStmtPrime', '+'): ["Expression", ";"],
+    ('ReturnStmtPrime', '-'): ["Expression", ";"],
+    ('ReturnStmtPrime', '('): ["Expression", ";"],
+    ('ReturnStmtPrime', 'NUM'): ["Expression", ";"],
+
+    ('SwitchStmt', 'switch'): ["switch", "(", "Expression", ")", "{", "CaseStmts", "DefaultStmt", "}"],
+
+    ('CaseStmts', 'ε'): ["ε"],
+    ('CaseStmts', 'case'): ["CaseStmt", "CaseStmts"],
+
+    ('CaseStmt', 'case'): ["case", "NUM", ":", "StatementList"],
+
+    ('DefaultStmt', 'default'): ["default", ":", "StatementList"],
+    ('DefaultStmt', 'ε'): ["ε"],
+
+    ('Expression', 'ID'): ["ID", "B"],
+    ('Expression', '+'): ["SimpleExpressionZegond"],
+    ('Expression', '-'): ["SimpleExpressionZegond"],
+    ('Expression', '('): ["SimpleExpressionZegond"],
+    ('Expression', 'NUM'): ["SimpleExpressionZegond"],
+
+    ('B', '='): ["=", "Expression"],
+    ('B', '['): ["[", "Expression", "]", "H"],
+    ('B', '('): ["SimpleExpressionPrime"],
+    ('B', '*'): ["SimpleExpressionPrime"],
+    ('B', '+'): ["SimpleExpressionPrime"],
+    ('B', '-'): ["SimpleExpressionPrime"],
+    ('B', '<'): ["SimpleExpressionPrime"],
+    ('B', '=='): ["SimpleExpressionPrime"],
+    ('B', 'ε'): ["SimpleExpressionPrime"],
+
+    ('H', '='): ["=", "Expression"],
+    ('H', '*'): ["G", "D", "C"],
+    ('H', 'ε'): ["G", "D", "C"],
+    ('H', '+'): ["G", "D", "C"],
+    ('H', '-'): ["G", "D", "C"],
+    ('H', '<'): ["G", "D", "C"],
+    ('H', '=='): ["G", "D", "C"],
+
+    ('SimpleExpressionZegond', '+'): ["AdditiveExpressionZegond", "C"],
+    ('SimpleExpressionZegond', '-'): ["AdditiveExpressionZegond", "C"],
+    ('SimpleExpressionZegond', '('): ["AdditiveExpressionZegond", "C"],
+    ('SimpleExpressionZegond', 'NUM'): ["AdditiveExpressionZegond", "C"],
+
+    ('SimpleExpressionPrime', '('): ["AdditiveExpressionPrime", "C"],
+    ('SimpleExpressionPrime', '*'): ["AdditiveExpressionPrime", "C"],
+    ('SimpleExpressionPrime', '+'): ["AdditiveExpressionPrime", "C"],
+    ('SimpleExpressionPrime', '-'): ["AdditiveExpressionPrime", "C"],
+    ('SimpleExpressionPrime', '<'): ["AdditiveExpressionPrime", "C"],
+    ('SimpleExpressionPrime', '=='): ["AdditiveExpressionPrime", "C"],
+    ('SimpleExpressionPrime', 'ε'): ["AdditiveExpressionPrime", "C"],
+
+    ('C', 'ε'): ["ε"],
+    ('C', '<'): ["Relop", "AdditiveExpression"],
+    ('C', '=='): ["Relop", "AdditiveExpression"],
+
+    ('Relop', '<'): ["<"],
+    ('Relop', '=='): {"<"},
+
+    ('AdditiveExpression', '+'): ["Term", "D"],
+    ('AdditiveExpression', '-'): ["Term", "D"],
+    ('AdditiveExpression', '('): ["Term", "D"],
+    ('AdditiveExpression', 'ID'): ["Term", "D"],
+    ('AdditiveExpression', 'NUM'): ["Term", "D"],
+
+    ('AdditiveExpressionPrime', '('): ["TermPrime", "D"],
+    ('AdditiveExpressionPrime', '*'): ["TermPrime", "D"],
+    ('AdditiveExpressionPrime', '+'): ["TermPrime", "D"],
+    ('AdditiveExpressionPrime', '-'): ["TermPrime", "D"],
+    ('AdditiveExpressionPrime', 'ε'): ["TermPrime", "D"],
+
+    ('AdditiveExpressionZegond', '+'): ["TermZegond", "D"],
+    ('AdditiveExpressionZegond', '-'): ["TermZegond", "D"],
+    ('AdditiveExpressionZegond', '('): ["TermZegond", "D"],
+    ('AdditiveExpressionZegond', 'NUM'): ["TermZegond", "D"],
+
+    ('D', 'ε'): ["ε"],
+    ('D', '+'): ["Addop", "Term", "D"],
+    ('D', '-'): ["Addop", "Term", "D"],
+
+    ('Addop', '+'): ["+"],
+    ('Addop', '-'): ["-"],
+
+    ('Term', '+'): ["SignedFactor", "G"],
+    ('Term', '-'): ["SignedFactor", "G"],
+    ('Term', '('): ["SignedFactor", "G"],
+    ('Term', 'ID'): ["SignedFactor", "G"],
+    ('Term', 'NUM'): ["SignedFactor", "G"],
+
+    ('TermPrime', '('): ["SignedFactorPrime", "G"],
+    ('TermPrime', '*'): ["SignedFactorPrime", "G"],
+    ('TermPrime', 'ε'): ["SignedFactorPrime", "G"],
+
+    ('TermZegond', '+'): ["SignedFactorZegond", "G"],
+    ('TermZegond', '-'): ["SignedFactorZegond", "G"],
+    ('TermZegond', '('): ["SignedFactorZegond", "G"],
+    ('TermZegond', 'NUM'): ["SignedFactorZegond", "G"],
+
+    ('G', '*'): ["*", "SignedFactor", "G"],
+    ('G', 'ε'): ["ε"],
+
+    ('SignedFactor', '+'): ["+", "Factor"],
+    ('SignedFactor', '-'): ["-", "Factor"],
+    ('SignedFactor', '('): ["Factor"],
+    ('SignedFactor', 'ID'): ["Factor"],
+    ('SignedFactor', 'NUM'): ["Factor"],
+
+    ('SignedFactorPrime', '('): ["FactorPrime"],
+    ('SignedFactorPrime', 'ε'): ["FactorPrime"],
+
+    ('SignedFactorZegond', '+'): ["+", "Factor"],
+    ('SignedFactorZegond', '-'): ["-", "Factor"],
+    ('SignedFactorZegond', '('): ["FactorZegond"],
+    ('SignedFactorZegond', 'NUM'): ["FactorZegond"],
+
+    ('Factor', '('): ["(", "Expression", ")"],
+    ('Factor', 'ID'): ["ID", "VarCallPrime"],
+    ('Factor', 'NUM'): ["NUM"],
+
+    ('VarCallPrime', '('): ["(", "Args", ")"],
+    ('VarCallPrime', '['): ["VarPrime"],
+    ('VarCallPrime', 'ε'): ["VarPrime"],
+
+    ('VarPrime', '['): ["[", "Expression", "]"],
+    ('VarPrime', 'ε'): ["ε"],
+
+    ('FactorPrime', '('): ["(", "Args", ")"],
+    ('FactorPrime', 'ε'): ["ε"],
+
+    ('FactorZegond', '('): ["(", "Args", ")"],
+    ('FactorZegond', 'NUM'): ["NUM"],
+
+    ('Args', 'ε'): ["ε"],
+    ('Args', 'ID'): ["ArgList"],
+    ('Args', '+'): ["ArgList"],
+    ('Args', '-'): ["ArgList"],
+    ('Args', '('): ["ArgList"],
+    ('Args', 'NUM'): ["ArgList"],
+
+    ('ArgList', 'ID'): ["Expression", "ArgListPrime"],
+    ('ArgList', '+'): ["Expression", "ArgListPrime"],
+    ('ArgList', '-'): ["Expression", "ArgListPrime"],
+    ('ArgList', '('): ["Expression", "ArgListPrime"],
+    ('ArgList', 'NUM'): ["Expression", "ArgListPrime"],
+
+    ('ArgListPrime', ','): [",", "Expression", "ArgListPrime"],
+    ('ArgListPrime', 'ε'): ["ε"]
 }
+non_terminals = ['Program', 'DeclarationList', 'Declaration', 'DeclarationInitial', 'DeclarationPrime',
+                 'VarDeclarationPrime', 'FunDeclarationPrime', 'TypeSpecifier', 'Params', 'ParamListVoidAbtar',
+                 'ParamList', 'Param', 'ParamPrime', 'CompoundStmt', 'StatementList', 'Statement', 'ExpressionStmt',
+                 'SelectionStmt', 'IterationStmt', 'ReturnStmt', 'ReturnStmtPrime', 'SwitchStmt', 'CaseStmts',
+                 'CaseStmt', 'DefaultStmt', 'Expression', 'B', 'H', 'SimpleExpressionZegond', 'SimpleExpressionPrime',
+                 'C', 'Relop', 'AdditiveExpression', 'AdditiveExpressionPrime', 'AdditiveExpressionZegond', 'D',
+                 'Addop', 'Term', 'TermPrime', 'TermZegond', 'G', 'SignedFactor', 'SignedFactorPrime',
+                 'SignedFactorZegond', 'Factor', 'VarCallPrime', 'VarPrime', 'FactorPrime', 'FactorZegond', 'Args',
+                 'ArgList', 'ArgListPrime']
+sync_table = {}
 
 
 class ErrorType:
@@ -112,11 +303,11 @@ def get_next_token_func():
     if input_file[input_index] in simple_symbols:
         token = input_file[input_index]
         input_index += 1
-        return "SYMBOL", token
+        return token, "SYMBOL"
     if input_file[input_index] == "*":
         input_index += 1
         if input_index >= len(input_file):
-            return "SYMBOL", "*"
+            return "*", "SYMBOL"
         if not is_in_language(input_file[input_index]):
             error_handler.handle_error(
                 lineno,
@@ -125,7 +316,7 @@ def get_next_token_func():
             )
             return
         if input_file[input_index] != "/":
-            return "SYMBOL", "*"
+            return "*", "SYMBOL"
         else:
             error_handler.handle_error(
                 lineno,
@@ -138,9 +329,9 @@ def get_next_token_func():
         input_index += 1
         if input_index < len(input_file) and input_file[input_index] == "=":
             input_index += 1
-            return "SYMBOL", "=="
+            return "==", "SYMBOL"
         if is_in_language(input_file[input_index]):
-            return "SYMBOL", "="
+            return "=", "SYMBOL"
         else:
             error_handler.handle_error(
                 lineno,
@@ -281,7 +472,7 @@ def get_next_token_func():
 
 def return_keyword_id(token):
     if token in key_words:
-        return "KEYWORD", token
+        return token, "KEYWORD"
     else:
         if token not in symbol_table:
             symbol_table.append(token)
@@ -329,14 +520,38 @@ def start_func(input_file_name="input.txt"):
         end_func()
         return
     file.close()
-
+    grammer_stack = ["$", "Program"]
     token = get_next_token()
     while token is None:
         token = get_next_token()
-    if token[0] == "$":
-        end_func()
-        return
-        # use token
+    while len(grammer_stack) != 0:
+
+        top_stack = grammer_stack.pop()
+
+        if token[0] == "$" or top_stack == "$":  # todo should be changed
+            if token[0] == "$" and top_stack == "$":
+                end_func()
+                return
+            else:
+                end_func()
+                return
+                # todo else error
+
+        if top_stack in non_terminals:
+            if (top_stack, token[0]) in parse_table:
+                grammer_stack += parse_table[(top_stack, token[0])][::-1]
+                continue
+            elif (top_stack, "ε") in parse_table:
+                grammer_stack += parse_table[(top_stack, "ε")][::-1]
+                continue
+            # todo else error
+        else:  # it is terminal
+            if token[0] == top_stack:
+                token = get_next_token()
+                while token is None:
+                    token = get_next_token()
+                continue
+            # todo else error
 
 
 def end_func():
