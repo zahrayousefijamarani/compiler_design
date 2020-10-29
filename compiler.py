@@ -520,38 +520,61 @@ def start_func(input_file_name="input.txt"):
         end_func()
         return
     file.close()
-    grammer_stack = ["$", "Program"]
+    parse_file = open("parse_tree.txt", "w+")
+    grammer_stack = [(0, "$"), (0, "Program")]
     token = get_next_token()
     while token is None:
         token = get_next_token()
     while len(grammer_stack) != 0:
-
         top_stack = grammer_stack.pop()
 
-        if token[0] == "$" or top_stack == "$":  # todo should be changed
-            if token[0] == "$" and top_stack == "$":
-                end_func()
-                return
-            else:
-                end_func()
-                return
-                # todo else error
+        print(token)
+        print(top_stack)
+        print(grammer_stack)
+        print("===============")
 
-        if top_stack in non_terminals:
-            if (top_stack, token[0]) in parse_table:
-                grammer_stack += parse_table[(top_stack, token[0])][::-1]
-                continue
-            elif (top_stack, "ε") in parse_table:
-                grammer_stack += parse_table[(top_stack, "ε")][::-1]
+        if top_stack[1] == "$":
+            if token[0] == "$":
+                add_to_parse_table(top_stack, parse_file)
+            # todo else error
+            break
+
+        if top_stack[1] in non_terminals:
+            if (top_stack[1], token[0]) in parse_table or ((top_stack[1], "ε") in parse_table):
+                depth = top_stack[0] + 1
+                if (top_stack[1], token[0]) in parse_table:
+                    l = parse_table[(top_stack[1], token[0])]
+                else:
+                    l = parse_table[(top_stack[1], "ε")]
+                for j in range(len(l) - 1, -1, -1):
+                    grammer_stack.append((depth, l[j]))
+                add_to_parse_table(top_stack, parse_file)
+                depth += 1
                 continue
             # todo else error
         else:  # it is terminal
-            if token[0] == top_stack:
+            if token[0] == top_stack[1]:
+                if token[0] == "ID" or token[0] == "NUM":
+                    add_to_parse_table((top_stack[0], '(' + token[0] + " ," + token[1] + ')'), parse_file)
+                else:
+                    add_to_parse_table((top_stack[0], '(' + token[1] + ", " + token[0] + ')'), parse_file)
                 token = get_next_token()
                 while token is None:
                     token = get_next_token()
                 continue
+            elif top_stack[1] == "ε":
+                add_to_parse_table((top_stack[0], "epsilon"), parse_file)
+                continue
             # todo else error
+    parse_file.close()
+
+
+def add_to_parse_table(grammer, file):
+    for i in range(0, grammer[0]):
+        file.write('\t')
+    file.write(str(grammer[1]))
+    file.write('\n')
+    return
 
 
 def end_func():
