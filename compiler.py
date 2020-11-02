@@ -463,6 +463,7 @@ def get_next_token_func():
                     return  # return error
             elif input_file[input_index] == '\n':
                 input_index -= 1
+        input_index -=1
     error_handler.handle_error(
         lineno,
         ErrorType.INVALID_INPUT,

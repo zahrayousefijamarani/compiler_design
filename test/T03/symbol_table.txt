@@ -10,8 +10,5 @@
 10.	return
 11.	f
 12.	a
-13.	g
+13.	main
 14.	b
-15.	output
-16.	h
-17.	main
