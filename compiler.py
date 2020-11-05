@@ -155,7 +155,7 @@ parse_table = {
     ('C', '=='): ["Relop", "AdditiveExpression"],
 
     ('Relop', '<'): ["<"],
-    ('Relop', '=='): {"<"},
+    ('Relop', '=='): ["<"],
 
     ('AdditiveExpression', '+'): ["Term", "D"],
     ('AdditiveExpression', '-'): ["Term", "D"],
@@ -528,12 +528,6 @@ def start_func(input_file_name="input.txt"):
         token = get_next_token()
     while len(grammer_stack) != 0:
         top_stack = grammer_stack.pop()
-
-        print(token)
-        print(top_stack)
-        print(grammer_stack)
-        print("===============")
-
         if top_stack[1] == "$":
             if token[0] == "$":
                 add_to_parse_table(top_stack, parse_file)
@@ -568,11 +562,12 @@ def start_func(input_file_name="input.txt"):
                 continue
             # todo else error
     parse_file.close()
+    end_func()
 
 
 def add_to_parse_table(grammer, file):
     for i in range(0, grammer[0]):
-        file.write('\t')
+        file.write('|\t')
     file.write(str(grammer[1]))
     file.write('\n')
     return
