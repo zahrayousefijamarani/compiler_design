@@ -1,2 +1,0 @@
-5.	(/, Invalid input)
-8.	(=$, Invalid input)

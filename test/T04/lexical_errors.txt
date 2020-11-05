@@ -1,3 +1,0 @@
-2.	(%, Invalid input)
-2.	(&, Invalid input)
-3.	(2a, Invalid number)

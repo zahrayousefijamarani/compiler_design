@@ -1,2 +1,2 @@
-4.	(1g, Invalid number)
-7.	(out$, Invalid input) (put^, Invalid input)
+5.	( , Invalid input)
+8.	(=$, Invalid input)
