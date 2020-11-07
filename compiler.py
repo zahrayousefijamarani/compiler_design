@@ -1,7 +1,6 @@
 # zahra yousefi jamarani  97102717
 # reza amini majd 97101275
 input_file = ""
-lexical_errors_file = open("lexical_errors.txt", "w+")
 input_index = 0
 lineno = 1  # represent line in code (will be ++ after \n)
 symbol_table = ["if", "else", "void", "int", "while", "break", "switch",
@@ -90,7 +89,8 @@ parse_table = {
     ('ExpressionStmt', '('): ["Expression", ";"],
     ('ExpressionStmt', 'NUM'): ["Expression", ";"],
 
-    ('SelectionStmt', 'if'): ["if", "(", "Expression", ")", "Statement", "else", "Statement"],
+    ('SelectionStmt', 'if'): ["if", "(", "Expression", ")", "Statement",
+                              "else", "Statement"],
 
     ('IterationStmt', 'while'): ["while", "(", "Expression", ")", "Statement"],
 
@@ -103,7 +103,8 @@ parse_table = {
     ('ReturnStmtPrime', '('): ["Expression", ";"],
     ('ReturnStmtPrime', 'NUM'): ["Expression", ";"],
 
-    ('SwitchStmt', 'switch'): ["switch", "(", "Expression", ")", "{", "CaseStmts", "DefaultStmt", "}"],
+    ('SwitchStmt', 'switch'): ["switch", "(", "Expression", ")", "{",
+                               "CaseStmts", "DefaultStmt", "}"],
 
     ('CaseStmts', 'ε'): ["ε"],
     ('CaseStmts', 'case'): ["CaseStmt", "CaseStmts"],
@@ -246,54 +247,159 @@ parse_table = {
     ('ArgListPrime', ','): [",", "Expression", "ArgListPrime"],
     ('ArgListPrime', 'ε'): ["ε"]
 }
-non_terminals = ['Program', 'DeclarationList', 'Declaration', 'DeclarationInitial', 'DeclarationPrime',
-                 'VarDeclarationPrime', 'FunDeclarationPrime', 'TypeSpecifier', 'Params', 'ParamListVoidAbtar',
-                 'ParamList', 'Param', 'ParamPrime', 'CompoundStmt', 'StatementList', 'Statement', 'ExpressionStmt',
-                 'SelectionStmt', 'IterationStmt', 'ReturnStmt', 'ReturnStmtPrime', 'SwitchStmt', 'CaseStmts',
-                 'CaseStmt', 'DefaultStmt', 'Expression', 'B', 'H', 'SimpleExpressionZegond', 'SimpleExpressionPrime',
-                 'C', 'Relop', 'AdditiveExpression', 'AdditiveExpressionPrime', 'AdditiveExpressionZegond', 'D',
-                 'Addop', 'Term', 'TermPrime', 'TermZegond', 'G', 'SignedFactor', 'SignedFactorPrime',
-                 'SignedFactorZegond', 'Factor', 'VarCallPrime', 'VarPrime', 'FactorPrime', 'FactorZegond', 'Args',
+
+error_parse_table = {
+    "DeclarationList": ['$', '{', 'break', ';', 'if', 'while', 'return',
+                        'switch', 'ID', '+', '-', '(', 'NUM', '}'],
+    "Declaration": ['int', 'void', '$', '{', 'break', ';', 'if', 'while',
+                    'return', 'switch', 'ID', '+', '-', '(', 'NUM', '}'],
+    "DeclarationInitial": ['(', ';', '[', ',', ')'],
+    "DeclarationPrime": ['int', 'void', '$', '{', 'break', ';', 'if', 'while',
+                         'return', 'switch', 'ID', '+', '-', '(', 'NUM', '}'],
+    "VarDeclarationPrime": ['int', 'void', '$', '{', 'break', ';', 'if',
+                            'while', 'return', 'switch', 'ID', '+', '-', '(',
+                            'NUM', '}'],
+    "FunDeclarationPrime": ['int', 'void', '$', '{', 'break', ';', 'if',
+                            'while', 'return', 'switch', 'ID', '+', '-', '(',
+                            'NUM', '}'],
+    "TypeSpecifier": ["ID"],
+    "Params": [')'],
+    "ParamListVoidAbtar": [')'],
+    "ParamList": [')'],
+    "Param": [',', ')'],
+    "ParamPrime": [',', ')'],
+    "CompoundStmt": ['int', 'void', '$', '{', 'break', ';', 'if', 'while',
+                     'return', 'switch', 'ID', '+', '-', '(', 'NUM', '}''else',
+                     'case', 'default'],
+    "StatementList": ['}', 'case', 'default'],
+    "Statement": ['{', 'break', ';', 'if', 'while', 'return',
+                  'switch', 'ID', '+', '-', '(', 'NUM', '}', 'else',
+                  'case', 'default'],
+    "ExpressionStmt": ['{', 'break', ';', 'if', 'while', 'return',
+                       'switch', 'ID', '+', '-', '(', 'NUM', '}', 'else',
+                       'case', 'default'],
+    "SelectionStmt": ['{', 'break', ';', 'if', 'while', 'return',
+                      'switch', 'ID', '+', '-', '(', 'NUM', '}', 'else',
+                      'case', 'default'],
+    "IterationStmt": ['{', 'break', ';', 'if', 'while', 'return',
+                      'switch', 'ID', '+', '-', '(', 'NUM', '}', 'else',
+                      'case', 'default'],
+    "ReturnStmt": ['{', 'break', ';', 'if', 'while', 'return',
+                   'switch', 'ID', '+', '-', '(', 'NUM', '}', 'else',
+                   'case', 'default'],
+    "ReturnStmtPrime": ['{', 'break', ';', 'if', 'while', 'return',
+                        'switch', 'ID', '+', '-', '(', 'NUM', '}', 'else',
+                        'case', 'default'],
+    "SwitchStmt": ['{', 'break', ';', 'if', 'while', 'return',
+                   'switch', 'ID', '+', '-', '(', 'NUM', '}', 'else',
+                   'case', 'default'],
+    "CaseStmts": ['}', 'default'],
+    "CaseStmt": ['}', 'case', 'default'],
+    "DefaultStmt": ['}'],
+    "Expression": [';', ')', ']', ','],
+    "B": [';', ')', ']', ','],
+    "H": [';', ')', ']', ','],
+    "SimpleExpressionZegond": [';', ')', ']', ','],
+    "SimpleExpressionPrime": [';', ')', ']', ','],
+    "C": [';', ')', ']', ','],
+    "Relop": ['+', '-', '(', 'ID', 'NUM'],
+    "AdditiveExpression": [';', ')', ']', ','],
+    "AdditiveExpressionPrime": ['<', '==', ';', ')', ']', ','],
+    "AdditiveExpressionZegond": ['<', '==', ';', ')', ']', ','],
+    "D": ['<', '==', ';', ')', ']', ','],
+    "Addop": ['+', '-', '(', 'ID', 'NUM'],
+    "Term": ['+', '-', '<', '==', ';', ')', ']', ','],
+    "TermPrime": ['+', '-', '<', '==', ';', ')', ']', ','],
+    "TermZegond": ['+', '-', '<', '==', ';', ')', ']', ','],
+    "G": ['+', '-', '<', '==', ';', ')', ']', ','],
+    "SignedFactor": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "SignedFactorPrime": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "SignedFactorZegond": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "Factor": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "VarCallPrime": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "VarPrime": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "FactorPrime": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "FactorZegond": ['*', '+', '-', '<', '==', ';', ')', ']', ','],
+    "Args": [')'],
+    "ArgList": [')'],
+    "ArgListPrime": [')'],
+
+}
+
+non_terminals = ['Program', 'DeclarationList', 'Declaration',
+                 'DeclarationInitial', 'DeclarationPrime',
+                 'VarDeclarationPrime', 'FunDeclarationPrime', 'TypeSpecifier',
+                 'Params', 'ParamListVoidAbtar',
+                 'ParamList', 'Param', 'ParamPrime', 'CompoundStmt',
+                 'StatementList', 'Statement', 'ExpressionStmt',
+                 'SelectionStmt', 'IterationStmt', 'ReturnStmt',
+                 'ReturnStmtPrime', 'SwitchStmt', 'CaseStmts',
+                 'CaseStmt', 'DefaultStmt', 'Expression', 'B', 'H',
+                 'SimpleExpressionZegond', 'SimpleExpressionPrime',
+                 'C', 'Relop', 'AdditiveExpression', 'AdditiveExpressionPrime',
+                 'AdditiveExpressionZegond', 'D',
+                 'Addop', 'Term', 'TermPrime', 'TermZegond', 'G',
+                 'SignedFactor', 'SignedFactorPrime',
+                 'SignedFactorZegond', 'Factor', 'VarCallPrime', 'VarPrime',
+                 'FactorPrime', 'FactorZegond', 'Args',
                  'ArgList', 'ArgListPrime']
 sync_table = {}
 
 
-class ErrorType:
+class ScannerErrorType:
     INVALID_INPUT = 'Invalid input'
     UNCLOSED_COMMENT = 'Unclosed comment'
     UN_MATCH_COMMENT = 'Unmatched comment'
     INVALID_NUMBER = 'Invalid number'
 
 
+class ParserErrorType:
+    MISSING = 'missing'
+    ILLEGAL = 'illegal'
+
+
 class ErrorHandler:
-    def __init__(self):
+    def __init__(self, scanner, parser):
         self.lexical_errors_file = open("lexical_errors.txt", "w+")
         self.no_error_message = 'There is no lexical error.'
         self.is_exist_error = False
         self.last_line = 0
+        self.scanner = scanner
+        self.parser = parser
 
     def close_file(self):
         if not self.is_exist_error:
             self.lexical_errors_file.write(self.no_error_message)
         self.lexical_errors_file.close()
 
-    def handle_error(self, line_number, error_type, problematic_word):
+    def handle_scanner_error(self, line_number, error_type, problematic_word):
         global input_index
-        # print(problematic_word)
-        self.is_exist_error = True
-        if self.last_line != line_number:
-            if self.last_line != 0:
-                self.lexical_errors_file.write('\n')
-            self.last_line = line_number
-            self.lexical_errors_file.write(str(
-                line_number) + ".	(" + problematic_word + ", " + error_type + ")")
-        else:
+        if self.scanner:
+            self.is_exist_error = True
+            if self.last_line != line_number:
+                if self.last_line != 0:
+                    self.lexical_errors_file.write('\n')
+                self.last_line = line_number
+                self.lexical_errors_file.write(str(
+                    line_number) + ".	(" + problematic_word + ", " + error_type + ")")
+            else:
+                self.lexical_errors_file.write(
+                    " (" + problematic_word + ", " + error_type + ")")
+            input_index += 1
+
+    def handle_parser_error(self, line_number, error_type=None, character=None,
+                            message=None):
+        if self.parser:
+            self.is_exist_error = True
+            error_message = message
+            if error_message is None:
+                error_message = f"{error_type} {character}"
             self.lexical_errors_file.write(
-                " (" + problematic_word + ", " + error_type + ")")
-        input_index += 1
+                f"#{line_number} : syntax error, {error_message}"
+            )
 
 
-error_handler = ErrorHandler()
+error_handler = ErrorHandler(False, True)
 
 
 def get_next_token_func():
@@ -309,18 +415,18 @@ def get_next_token_func():
         if input_index >= len(input_file):
             return "*", "SYMBOL"
         if not is_in_language(input_file[input_index]):
-            error_handler.handle_error(
+            error_handler.handle_scanner_error(
                 lineno,
-                ErrorType.INVALID_INPUT,
+                ScannerErrorType.INVALID_INPUT,
                 "*" + input_file[input_index]
             )
             return
         if input_file[input_index] != "/":
             return "*", "SYMBOL"
         else:
-            error_handler.handle_error(
+            error_handler.handle_scanner_error(
                 lineno,
-                ErrorType.UN_MATCH_COMMENT,
+                ScannerErrorType.UN_MATCH_COMMENT,
                 '*/'
             )
             return
@@ -333,9 +439,9 @@ def get_next_token_func():
         if is_in_language(input_file[input_index]):
             return "=", "SYMBOL"
         else:
-            error_handler.handle_error(
+            error_handler.handle_scanner_error(
                 lineno,
-                ErrorType.INVALID_INPUT,
+                ScannerErrorType.INVALID_INPUT,
                 "=" + input_file[input_index]
             )
             return
@@ -353,18 +459,18 @@ def get_next_token_func():
             if input_index >= len(input_file):
                 return "NUM", token
         if not is_in_language(input_file[input_index]):
-            error_handler.handle_error(
+            error_handler.handle_scanner_error(
                 lineno,
-                ErrorType.INVALID_NUMBER,
+                ScannerErrorType.INVALID_NUMBER,
                 token + input_file[input_index]
             )
             return
         if not is_letter(input_file[input_index]):
             return "NUM", token
         else:
-            error_handler.handle_error(
+            error_handler.handle_scanner_error(
                 lineno,
-                ErrorType.INVALID_NUMBER,
+                ScannerErrorType.INVALID_NUMBER,
                 token + input_file[input_index]
             )
             return  # lexical error like 123d
@@ -384,9 +490,9 @@ def get_next_token_func():
             if is_in_language(input_file[input_index]):
                 return return_keyword_id(token)
             else:
-                error_handler.handle_error(
+                error_handler.handle_scanner_error(
                     lineno,
-                    ErrorType.INVALID_INPUT,
+                    ScannerErrorType.INVALID_INPUT,
                     token + input_file[input_index]
                 )
                 return  # lexical error
@@ -437,9 +543,9 @@ def get_next_token_func():
                             token += input_file[input_index]
                             input_index += 1
                             if input_index >= len(input_file):
-                                error_handler.handle_error(
+                                error_handler.handle_scanner_error(
                                     lineno,
-                                    ErrorType.UNCLOSED_COMMENT,
+                                    ScannerErrorType.UNCLOSED_COMMENT,
                                     token[:7] + '...'
                                 )
                                 return  # return error
@@ -448,25 +554,25 @@ def get_next_token_func():
                             token += input_file[input_index]
                             input_index += 1
                             if input_index >= len(input_file):
-                                error_handler.handle_error(
+                                error_handler.handle_scanner_error(
                                     lineno,
-                                    ErrorType.UNCLOSED_COMMENT,
+                                    ScannerErrorType.UNCLOSED_COMMENT,
                                     token[:7] + '...'
                                 )
                                 return  # return error
                 else:
-                    error_handler.handle_error(
+                    error_handler.handle_scanner_error(
                         lineno,
-                        ErrorType.UNCLOSED_COMMENT,
+                        ScannerErrorType.UNCLOSED_COMMENT,
                         token[:7] + '...'
                     )
                     return  # return error
             elif input_file[input_index] == '\n':
                 input_index -= 1
-        input_index -=1
-    error_handler.handle_error(
+        input_index -= 1
+    error_handler.handle_scanner_error(
         lineno,
-        ErrorType.INVALID_INPUT,
+        ScannerErrorType.INVALID_INPUT,
         input_file[input_index]
     )
 
@@ -505,7 +611,8 @@ def get_next_token():
             number_of_next_line = token_result[1].count('\n')
             for i in range(number_of_next_line):
                 lineno += 1
-            if token_result[0] != "WHITESPACE" and token_result[0] != "COMMENT":
+            if token_result[0] != "WHITESPACE" and token_result[
+                0] != "COMMENT":
                 return token_result
     else:
         return "$", "$"
@@ -517,42 +624,50 @@ def start_func(input_file_name="input.txt"):
         file = open(input_file_name, "r")
         input_file = file.read()
     except FileNotFoundError:
-        # print("input file not found!")
         end_func()
         return
     file.close()
     parse_file = open("parse_tree.txt", "w+")
-    grammer_stack = [(0, "$"), (0, "Program")]
+    grammar_stack = [(0, "$"), (0, "Program")]
     token = get_next_token()
     while token is None:
         token = get_next_token()
-    while len(grammer_stack) != 0:
-        top_stack = grammer_stack.pop()
+    while len(grammar_stack) != 0:
+        top_stack = grammar_stack.pop()
         if top_stack[1] == "$":
             if token[0] == "$":
                 add_to_parse_table(top_stack, parse_file)
-            # todo else error
+            error_handler.handle_parser_error(lineno, "unexpected EOF")  # todo
             break
 
         if top_stack[1] in non_terminals:
-            if (top_stack[1], token[0]) in parse_table or ((top_stack[1], "ε") in parse_table):
+            if (top_stack[1], token[0]) in parse_table or (
+                    (top_stack[1], "ε") in parse_table):
                 depth = top_stack[0] + 1
                 if (top_stack[1], token[0]) in parse_table:
                     l = parse_table[(top_stack[1], token[0])]
                 else:
                     l = parse_table[(top_stack[1], "ε")]
                 for j in range(len(l) - 1, -1, -1):
-                    grammer_stack.append((depth, l[j]))
+                    grammar_stack.append((depth, l[j]))
                 add_to_parse_table(top_stack, parse_file)
                 depth += 1
                 continue
-            # todo else error
+            error_handler.handle_parser_error(
+                lineno,
+                ParserErrorType.MISSING,  # todo
+                'missing character'  # todo
+            )
         else:  # it is terminal
             if token[0] == top_stack[1]:
                 if token[0] == "ID" or token[0] == "NUM":
-                    add_to_parse_table((top_stack[0], '(' + token[0] + " ," + token[1] + ')'), parse_file)
+                    add_to_parse_table(
+                        (top_stack[0], '(' + token[0] + " ," + token[1] + ')'),
+                        parse_file)
                 else:
-                    add_to_parse_table((top_stack[0], '(' + token[1] + ", " + token[0] + ')'), parse_file)
+                    add_to_parse_table(
+                        (top_stack[0], '(' + token[1] + ", " + token[0] + ')'),
+                        parse_file)
                 token = get_next_token()
                 while token is None:
                     token = get_next_token()
@@ -560,15 +675,19 @@ def start_func(input_file_name="input.txt"):
             elif top_stack[1] == "ε":
                 add_to_parse_table((top_stack[0], "epsilon"), parse_file)
                 continue
-            # todo else error
+            error_handler.handle_parser_error(
+                lineno,
+                ParserErrorType.ILLEGAL,  # todo
+                'illegal character'  # todo
+            )
     parse_file.close()
     end_func()
 
 
-def add_to_parse_table(grammer, file):
-    for i in range(0, grammer[0]):
+def add_to_parse_table(grammar, file):
+    for i in range(0, grammar[0]):
         file.write('|\t')
-    file.write(str(grammer[1]))
+    file.write(str(grammar[1]))
     file.write('\n')
     return
 
