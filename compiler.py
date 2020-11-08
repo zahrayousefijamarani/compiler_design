@@ -638,8 +638,8 @@ def start_func(input_file_name="input.txt"):
         if top_stack[1] == "$":
             if token[0] == "$":
                 add_to_parse_table(top_stack, parse_file)
-            # else:
-            #     error_handler.handle_parser_error(lineno, "unexpected EOF")  # todo
+            else:
+                error_handler.handle_parser_error(lineno, "unexpected EOF")  # todo
             break
 
         if top_stack[1] in non_terminals:

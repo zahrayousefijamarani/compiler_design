@@ -8,10 +8,7 @@ Program
 |	|	|	DeclarationPrime
 |	|	|	|	FunDeclarationPrime
 |	|	|	|	|	(SYMBOL, ()
-|	|	|	|	|	Params
-|	|	|	|	|	|	(KEYWORD, void)
-|	|	|	|	|	|	ParamListVoidAbtar
-|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	(SYMBOL, ))
 |	|	|	|	|	CompoundStmt
 |	|	|	|	|	|	(SYMBOL, {)
 |	|	|	|	|	|	DeclarationList
@@ -19,7 +16,7 @@ Program
 |	|	|	|	|	|	|	|	DeclarationInitial
 |	|	|	|	|	|	|	|	|	TypeSpecifier
 |	|	|	|	|	|	|	|	|	|	(KEYWORD, int)
-|	|	|	|	|	|	|	|	|	(ID ,prod)
+|	|	|	|	|	|	|	|	|	(ID ,a)
 |	|	|	|	|	|	|	|	DeclarationPrime
 |	|	|	|	|	|	|	|	|	VarDeclarationPrime
 |	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
@@ -28,7 +25,7 @@ Program
 |	|	|	|	|	|	|	|	|	DeclarationInitial
 |	|	|	|	|	|	|	|	|	|	TypeSpecifier
 |	|	|	|	|	|	|	|	|	|	|	(KEYWORD, int)
-|	|	|	|	|	|	|	|	|	|	(ID ,i)
+|	|	|	|	|	|	|	|	|	|	(ID ,b)
 |	|	|	|	|	|	|	|	|	DeclarationPrime
 |	|	|	|	|	|	|	|	|	|	VarDeclarationPrime
 |	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
@@ -38,7 +35,7 @@ Program
 |	|	|	|	|	|	|	Statement
 |	|	|	|	|	|	|	|	ExpressionStmt
 |	|	|	|	|	|	|	|	|	Expression
-|	|	|	|	|	|	|	|	|	|	(ID ,prod)
+|	|	|	|	|	|	|	|	|	|	(ID ,a)
 |	|	|	|	|	|	|	|	|	|	B
 |	|	|	|	|	|	|	|	|	|	|	(SYMBOL, =)
 |	|	|	|	|	|	|	|	|	|	|	Expression
@@ -46,39 +43,30 @@ Program
 |	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionZegond
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	TermZegond
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorZegond
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorZegond
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(NUM ,1)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, -)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Factor
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(ID ,b)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	VarCallPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	VarPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	D
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
-|	|	|	|	|	|	|	|	|	|	|	|	|	C
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
-|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
-|	|	|	|	|	|	|	StatementList
-|	|	|	|	|	|	|	|	Statement
-|	|	|	|	|	|	|	|	|	ExpressionStmt
-|	|	|	|	|	|	|	|	|	|	Expression
-|	|	|	|	|	|	|	|	|	|	|	(ID ,i)
-|	|	|	|	|	|	|	|	|	|	|	B
-|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, =)
-|	|	|	|	|	|	|	|	|	|	|	|	Expression
-|	|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionZegond
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionZegond
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermZegond
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorZegond
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, +)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Addop
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, +)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Term
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactor
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Factor
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(NUM ,1)
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
 |	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	C
-|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
-|	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
-|	|	|	|	|	|	|	|	StatementList
-|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
+|	|	|	|	|	|	|	StatementList
+|	|	|	|	|	|	|	|	epsilon
 |	|	|	|	|	|	(SYMBOL, })
 |	|	DeclarationList
 |	|	|	epsilon
