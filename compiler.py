@@ -228,7 +228,7 @@ parse_table = {
     ('FactorPrime', '('): ["(", "Args", ")"],
     ('FactorPrime', 'ε'): ["ε"],
 
-    ('FactorZegond', '('): ["(", "Args", ")"],
+    ('FactorZegond', '('): ["(", "Expression", ")"],
     ('FactorZegond', 'NUM'): ["NUM"],
 
     ('Args', 'ε'): ["ε"],
@@ -654,7 +654,7 @@ def start_func(input_file_name="input.txt"):
 
         if top_stack[1] in non_terminals:
             if token[0] == "$" and (
-            not (token[0] in error_parse_table[top_stack[1]])):
+                    not (token[0] in error_parse_table[top_stack[1]])):
                 error_handler.handle_parser_error(lineno,
                                                   message="unexpected EOF")
                 break
@@ -734,6 +734,5 @@ def end_func():
     symbol_file.close()
     error_handler.close_file()
     return
-
 
 # start_func()
