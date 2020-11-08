@@ -360,8 +360,8 @@ class ParserErrorType:
 
 class ErrorHandler:
     def __init__(self, scanner, parser):
-        self.lexical_errors_file = open("lexical_errors.txt", "w+")
-        self.no_error_message = 'There is no lexical error.'
+        self.lexical_errors_file = open("syntax_errors.txt", "w+")
+        self.no_error_message = 'There is no syntax error.'
         self.is_exist_error = False
         self.last_line = 0
         self.scanner = scanner
@@ -637,7 +637,8 @@ def start_func(input_file_name="input.txt"):
         if top_stack[1] == "$":
             if token[0] == "$":
                 add_to_parse_table(top_stack, parse_file)
-            error_handler.handle_parser_error(lineno, "unexpected EOF")  # todo
+            # else:
+            #     error_handler.handle_parser_error(lineno, "unexpected EOF")  # todo
             break
 
         if top_stack[1] in non_terminals:
@@ -653,11 +654,24 @@ def start_func(input_file_name="input.txt"):
                 add_to_parse_table(top_stack, parse_file)
                 depth += 1
                 continue
-            error_handler.handle_parser_error(
-                lineno,
-                ParserErrorType.MISSING,  # todo
-                'missing character'  # todo
-            )
+            else:
+                if token[1] in error_parse_table[top_stack[1]]: # synch
+                    error_handler.handle_parser_error(
+                        lineno,
+                        ParserErrorType.MISSING,  # todo
+                        top_stack[1]  # todo
+                    )
+                else: # illegal
+                    error_handler.handle_parser_error(
+                        lineno,
+                        ParserErrorType.ILLEGAL,  # todo
+                        token[1] # todo
+                    )
+                    token = get_next_token()
+                    while token is None:
+                        token = get_next_token()
+                    continue
+
         else:  # it is terminal
             if token[0] == top_stack[1]:
                 if token[0] == "ID" or token[0] == "NUM":
@@ -675,11 +689,12 @@ def start_func(input_file_name="input.txt"):
             elif top_stack[1] == "ε":
                 add_to_parse_table((top_stack[0], "epsilon"), parse_file)
                 continue
-            error_handler.handle_parser_error(
-                lineno,
-                ParserErrorType.ILLEGAL,  # todo
-                'illegal character'  # todo
-            )
+            else:
+                error_handler.handle_parser_error(
+                    lineno,
+                    ParserErrorType.MISSING,  # todo
+                    top_stack[1]  # todo
+                )
     parse_file.close()
     end_func()
 
@@ -703,4 +718,4 @@ def end_func():
     return
 
 
-start_func()
+# start_func()

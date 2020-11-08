@@ -1,4 +1,6 @@
 import compiler
+
+
 def check_file(file_name, file_num):
     file = open(f"test/T{file_num}/" + file_name + ".txt", "r")
     answer_lines = file.readlines()
