@@ -156,7 +156,7 @@ parse_table = {
     ('C', '=='): ["Relop", "AdditiveExpression"],
 
     ('Relop', '<'): ["<"],
-    ('Relop', '=='): ["<"],
+    ('Relop', '=='): ["=="],
 
     ('AdditiveExpression', '+'): ["Term", "D"],
     ('AdditiveExpression', '-'): ["Term", "D"],
@@ -649,16 +649,18 @@ def start_func(input_file_name="input.txt"):
                 add_to_parse_table(top_stack, parse_file)
             else:
                 error_handler.handle_parser_error(lineno,
-                                                  "unexpected EOF","")  # todo
+                                                  message="unexpected EOF")
             break
 
         if top_stack[1] in non_terminals:
-            if token[0] == "$" and (not (token[0] in error_parse_table[top_stack[1]])):
+            if token[0] == "$" and (
+            not (token[0] in error_parse_table[top_stack[1]])):
                 error_handler.handle_parser_error(lineno,
-                                                  "unexpected EOF","")  # todo
+                                                  message="unexpected EOF")
                 break
             if (top_stack[1], token[0]) in parse_table or (
-                    ((top_stack[1], "ε") in parse_table) and (token[0] in error_parse_table[top_stack[1]])):
+                    ((top_stack[1], "ε") in parse_table) and (
+                    token[0] in error_parse_table[top_stack[1]])):
                 depth = top_stack[0] + 1
                 if (top_stack[1], token[0]) in parse_table:
                     l = parse_table[(top_stack[1], token[0])]
@@ -733,4 +735,5 @@ def end_func():
     error_handler.close_file()
     return
 
-# start_func()
+
+start_func()
