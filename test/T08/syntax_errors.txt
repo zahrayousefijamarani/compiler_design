@@ -1,1 +1,1 @@
-#7 : syntax error, missing Signed-factor
+#7 : Syntax Error, Missing SignedFactor

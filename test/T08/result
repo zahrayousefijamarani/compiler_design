@@ -1,0 +1,241 @@
+Program
+|	DeclarationList
+|	|	Declaration
+|	|	|	DeclarationInitial
+|	|	|	|	TypeSpecifier
+|	|	|	|	|	(KEYWORD, int)
+|	|	|	|	(ID ,fact)
+|	|	|	DeclarationPrime
+|	|	|	|	FunDeclarationPrime
+|	|	|	|	|	(SYMBOL, ()
+|	|	|	|	|	Params
+|	|	|	|	|	|	(KEYWORD, int)
+|	|	|	|	|	|	(ID ,n)
+|	|	|	|	|	|	ParamPrime
+|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	ParamList
+|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	(SYMBOL, ))
+|	|	|	|	|	CompoundStmt
+|	|	|	|	|	|	(SYMBOL, {)
+|	|	|	|	|	|	DeclarationList
+|	|	|	|	|	|	|	Declaration
+|	|	|	|	|	|	|	|	DeclarationInitial
+|	|	|	|	|	|	|	|	|	TypeSpecifier
+|	|	|	|	|	|	|	|	|	|	(KEYWORD, int)
+|	|	|	|	|	|	|	|	|	(ID ,f)
+|	|	|	|	|	|	|	|	DeclarationPrime
+|	|	|	|	|	|	|	|	|	VarDeclarationPrime
+|	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
+|	|	|	|	|	|	|	DeclarationList
+|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	StatementList
+|	|	|	|	|	|	|	Statement
+|	|	|	|	|	|	|	|	SelectionStmt
+|	|	|	|	|	|	|	|	|	(KEYWORD, if)
+|	|	|	|	|	|	|	|	|	(SYMBOL, ()
+|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	(ID ,n)
+|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, =)
+|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(NUM ,1)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	(SYMBOL, ))
+|	|	|	|	|	|	|	|	|	Statement
+|	|	|	|	|	|	|	|	|	|	ExpressionStmt
+|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	(ID ,f)
+|	|	|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, =)
+|	|	|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, -)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Factor
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(NUM ,1)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
+|	|	|	|	|	|	|	|	|	(KEYWORD, else)
+|	|	|	|	|	|	|	|	|	Statement
+|	|	|	|	|	|	|	|	|	|	ExpressionStmt
+|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	(ID ,f)
+|	|	|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, =)
+|	|	|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	(ID ,n)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, *)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, *)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactor
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Factor
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(ID ,factorial)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	VarCallPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ()
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Args
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	ArgList
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(ID ,n)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Addop
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, -)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Term
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactor
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Factor
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(NUM ,1)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	ArgListPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ))
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
+|	|	|	|	|	|	|	StatementList
+|	|	|	|	|	|	|	|	Statement
+|	|	|	|	|	|	|	|	|	ReturnStmt
+|	|	|	|	|	|	|	|	|	|	(KEYWORD, return)
+|	|	|	|	|	|	|	|	|	|	ReturnStmtPrime
+|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	(ID ,f)
+|	|	|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
+|	|	|	|	|	|	|	|	StatementList
+|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	(SYMBOL, })
+|	|	DeclarationList
+|	|	|	Declaration
+|	|	|	|	DeclarationInitial
+|	|	|	|	|	TypeSpecifier
+|	|	|	|	|	|	(KEYWORD, void)
+|	|	|	|	|	(ID ,main)
+|	|	|	|	DeclarationPrime
+|	|	|	|	|	FunDeclarationPrime
+|	|	|	|	|	|	(SYMBOL, ()
+|	|	|	|	|	|	Params
+|	|	|	|	|	|	|	(KEYWORD, void)
+|	|	|	|	|	|	|	ParamListVoidAbtar
+|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	(SYMBOL, ))
+|	|	|	|	|	|	CompoundStmt
+|	|	|	|	|	|	|	(SYMBOL, {)
+|	|	|	|	|	|	|	DeclarationList
+|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	StatementList
+|	|	|	|	|	|	|	|	Statement
+|	|	|	|	|	|	|	|	|	ExpressionStmt
+|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	(ID ,output)
+|	|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ()
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Args
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	ArgList
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(ID ,factorial)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	B
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ()
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Args
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	ArgList
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	Expression
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SimpleExpressionZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	AdditiveExpressionZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	TermZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	SignedFactorZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	FactorZegond
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(NUM ,3)
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	ArgListPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ))
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	ArgListPrime
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	(SYMBOL, ))
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	G
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	D
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	|	|	|	C
+|	|	|	|	|	|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	|	|	|	(SYMBOL, ;)
+|	|	|	|	|	|	|	|	StatementList
+|	|	|	|	|	|	|	|	|	epsilon
+|	|	|	|	|	|	|	(SYMBOL, })
+|	|	|	DeclarationList
+|	|	|	|	epsilon
+$

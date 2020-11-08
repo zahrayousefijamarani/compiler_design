@@ -1,1 +1,1 @@
-#7 : syntax error, missing Additive-expression
+#7 : Syntax Error, Missing AdditiveExpression
