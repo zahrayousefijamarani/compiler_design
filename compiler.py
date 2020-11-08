@@ -360,22 +360,27 @@ class ParserErrorType:
 
 class ErrorHandler:
     def __init__(self, scanner, parser):
-        self.lexical_errors_file = open("syntax_errors.txt", "w+")
+        self.lexical_errors_file = open("lexical_errors.txt", "w+")
+        self.syntax_errors_file = open("syntax_errors.txt", "w+")
         self.no_error_message = 'There is no syntax error.'
-        self.is_exist_error = False
+        self.is_exist_lexical_error = False
+        self.is_exist_syntax_error = False
         self.last_line = 0
         self.scanner = scanner
         self.parser = parser
 
     def close_file(self):
-        if not self.is_exist_error:
+        if not self.is_exist_lexical_error:
             self.lexical_errors_file.write(self.no_error_message)
         self.lexical_errors_file.close()
+        if not self.is_exist_syntax_error:
+            self.syntax_errors_file.write(self.no_error_message)
+        self.syntax_errors_file.close()
 
     def handle_scanner_error(self, line_number, error_type, problematic_word):
         global input_index
         if self.scanner:
-            self.is_exist_error = True
+            self.is_exist_lexical_error = True
             if self.last_line != line_number:
                 if self.last_line != 0:
                     self.lexical_errors_file.write('\n')
@@ -390,17 +395,16 @@ class ErrorHandler:
     def handle_parser_error(self, line_number, error_type=None, character=None,
                             message=None):
         if self.parser:
-            self.is_exist_error = True
+            self.is_exist_syntax_error = True
             error_message = message
             if error_message is None:
                 error_message = f"{error_type} {character}"
-            self.lexical_errors_file.write(
-                f"#{line_number} : Syntax Error, {error_message}"
+            self.syntax_errors_file.write(
+                f"#{line_number} : Syntax Error, {error_message}\n"
             )
-            self.lexical_errors_file.write('\n')
 
 
-error_handler = ErrorHandler(False, True)
+error_handler = ErrorHandler(scanner=False, parser=True)
 
 
 def get_next_token_func():
@@ -639,7 +643,8 @@ def start_func(input_file_name="input.txt"):
             if token[0] == "$":
                 add_to_parse_table(top_stack, parse_file)
             else:
-                error_handler.handle_parser_error(lineno, "unexpected EOF")  # todo
+                error_handler.handle_parser_error(lineno,
+                                                  "unexpected EOF")  # todo
             break
 
         if top_stack[1] in non_terminals:
