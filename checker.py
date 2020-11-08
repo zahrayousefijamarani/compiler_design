@@ -24,6 +24,5 @@ i = int(input())
 file_number = str(i) if i > 9 else f'0{i}'
 print(f"*** start Test {file_number} ***")
 compiler.start_func(f"test/T{file_number}/input.txt")
-# check_file("syntax_errors", file_number)
-# check_file("parse_tree", file_number)
 check_file("syntax_errors", file_number)
+check_file("parse_tree", file_number)
