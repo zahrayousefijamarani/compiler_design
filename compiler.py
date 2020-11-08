@@ -354,8 +354,8 @@ class ScannerErrorType:
 
 
 class ParserErrorType:
-    MISSING = 'missing'
-    ILLEGAL = 'illegal'
+    MISSING = 'Missing'
+    ILLEGAL = 'Illegal'
 
 
 class ErrorHandler:
@@ -395,8 +395,9 @@ class ErrorHandler:
             if error_message is None:
                 error_message = f"{error_type} {character}"
             self.lexical_errors_file.write(
-                f"#{line_number} : syntax error, {error_message}"
+                f"#{line_number} : Syntax Error, {error_message}"
             )
+            self.lexical_errors_file.write('\n')
 
 
 error_handler = ErrorHandler(False, True)
@@ -655,17 +656,17 @@ def start_func(input_file_name="input.txt"):
                 depth += 1
                 continue
             else:
-                if token[1] in error_parse_table[top_stack[1]]: # synch
+                if token[0] in error_parse_table[top_stack[1]]:  # synch
                     error_handler.handle_parser_error(
                         lineno,
                         ParserErrorType.MISSING,  # todo
                         top_stack[1]  # todo
                     )
-                else: # illegal
+                else:  # illegal
                     error_handler.handle_parser_error(
                         lineno,
                         ParserErrorType.ILLEGAL,  # todo
-                        token[1] # todo
+                        token[0]  # todo
                     )
                     token = get_next_token()
                     while token is None:
@@ -716,6 +717,5 @@ def end_func():
     symbol_file.close()
     error_handler.close_file()
     return
-
 
 # start_func()
