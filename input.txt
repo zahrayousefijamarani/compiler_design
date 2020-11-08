@@ -1,7 +1,6 @@
-/*sample 6*/
-void main(void{
+void main(void a){
 	int prod;
 	int i;
-		prod = 1;
-		i = +1;
+	//ggg
+		prod = 1d;
 }

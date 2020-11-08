@@ -343,7 +343,6 @@ non_terminals = ['Program', 'DeclarationList', 'Declaration',
                  'SignedFactorZegond', 'Factor', 'VarCallPrime', 'VarPrime',
                  'FactorPrime', 'FactorZegond', 'Args',
                  'ArgList', 'ArgListPrime']
-sync_table = {}
 
 
 class ScannerErrorType:
@@ -389,16 +388,15 @@ class ErrorHandler:
                 " (" + problematic_word + ", " + error_type + ")")
         input_index += 1
 
-
-def handle_parser_error(self, line_number, error_type=None, character=None,
-                        message=None):
-    self.is_exist_syntax_error = True
-    error_message = message
-    if error_message is None:
-        error_message = f"{error_type} {character}"
-    self.syntax_errors_file.write(
-        f"#{line_number} : Syntax Error, {error_message}\n"
-    )
+    def handle_parser_error(self, line_number, error_type=None, character=None,
+                            message=None):
+        self.is_exist_syntax_error = True
+        error_message = message
+        if error_message is None:
+            error_message = f"{error_type} {character}"
+        self.syntax_errors_file.write(
+            f"#{line_number} : Syntax Error, {error_message}\n"
+        )
 
 
 error_handler = ErrorHandler()
@@ -732,4 +730,5 @@ def end_func():
     error_handler.close_file()
     return
 
-# start_func()
+
+start_func()
