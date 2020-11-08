@@ -1,0 +1,14 @@
+Program
+|	DeclarationList
+|	|	Declaration
+|	|	|	DeclarationInitial
+|	|	|	|	TypeSpecifier
+|	|	|	|	|	(KEYWORD, void)
+|	|	|	|	(ID ,main)
+|	|	|	DeclarationPrime
+|	|	|	|	FunDeclarationPrime
+|	|	|	|	|	(SYMBOL, ()
+|	|	|	|	|	Params
+|	|	|	|	|	|	(KEYWORD, void)
+|	|	|	|	|	|	ParamListVoidAbtar
+|	|	|	|	|	|	|	(ID ,prod)

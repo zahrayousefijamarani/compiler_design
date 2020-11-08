@@ -638,18 +638,27 @@ def start_func(input_file_name="input.txt"):
     while token is None:
         token = get_next_token()
     while len(grammar_stack) != 0:
+        # print(grammar_stack)
         top_stack = grammar_stack.pop()
+
+        # print(token)
+        # print("====================")
+
         if top_stack[1] == "$":
             if token[0] == "$":
                 add_to_parse_table(top_stack, parse_file)
             else:
                 error_handler.handle_parser_error(lineno,
-                                                  "unexpected EOF")  # todo
+                                                  "unexpected EOF","")  # todo
             break
 
         if top_stack[1] in non_terminals:
+            if token[0] == "$" and (not (token[0] in error_parse_table[top_stack[1]])):
+                error_handler.handle_parser_error(lineno,
+                                                  "unexpected EOF","")  # todo
+                break
             if (top_stack[1], token[0]) in parse_table or (
-                    (top_stack[1], "ε") in parse_table):
+                    ((top_stack[1], "ε") in parse_table) and (token[0] in error_parse_table[top_stack[1]])):
                 depth = top_stack[0] + 1
                 if (top_stack[1], token[0]) in parse_table:
                     l = parse_table[(top_stack[1], token[0])]
@@ -673,6 +682,7 @@ def start_func(input_file_name="input.txt"):
                         ParserErrorType.ILLEGAL,  # todo
                         token[0]  # todo
                     )
+                    grammar_stack.append(top_stack)
                     token = get_next_token()
                     while token is None:
                         token = get_next_token()
