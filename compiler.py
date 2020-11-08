@@ -359,15 +359,13 @@ class ParserErrorType:
 
 
 class ErrorHandler:
-    def __init__(self, scanner, parser):
+    def __init__(self):
         self.lexical_errors_file = open("lexical_errors.txt", "w+")
         self.syntax_errors_file = open("syntax_errors.txt", "w+")
         self.no_error_message = 'There is no syntax error.'
         self.is_exist_lexical_error = False
         self.is_exist_syntax_error = False
         self.last_line = 0
-        self.scanner = scanner
-        self.parser = parser
 
     def close_file(self):
         if not self.is_exist_lexical_error:
@@ -379,32 +377,31 @@ class ErrorHandler:
 
     def handle_scanner_error(self, line_number, error_type, problematic_word):
         global input_index
-        if self.scanner:
-            self.is_exist_lexical_error = True
-            if self.last_line != line_number:
-                if self.last_line != 0:
-                    self.lexical_errors_file.write('\n')
-                self.last_line = line_number
-                self.lexical_errors_file.write(str(
-                    line_number) + ".	(" + problematic_word + ", " + error_type + ")")
-            else:
-                self.lexical_errors_file.write(
-                    " (" + problematic_word + ", " + error_type + ")")
-            input_index += 1
-
-    def handle_parser_error(self, line_number, error_type=None, character=None,
-                            message=None):
-        if self.parser:
-            self.is_exist_syntax_error = True
-            error_message = message
-            if error_message is None:
-                error_message = f"{error_type} {character}"
-            self.syntax_errors_file.write(
-                f"#{line_number} : Syntax Error, {error_message}\n"
-            )
+        self.is_exist_lexical_error = True
+        if self.last_line != line_number:
+            if self.last_line != 0:
+                self.lexical_errors_file.write('\n')
+            self.last_line = line_number
+            self.lexical_errors_file.write(str(
+                line_number) + ".	(" + problematic_word + ", " + error_type + ")")
+        else:
+            self.lexical_errors_file.write(
+                " (" + problematic_word + ", " + error_type + ")")
+        input_index += 1
 
 
-error_handler = ErrorHandler(scanner=False, parser=True)
+def handle_parser_error(self, line_number, error_type=None, character=None,
+                        message=None):
+    self.is_exist_syntax_error = True
+    error_message = message
+    if error_message is None:
+        error_message = f"{error_type} {character}"
+    self.syntax_errors_file.write(
+        f"#{line_number} : Syntax Error, {error_message}\n"
+    )
+
+
+error_handler = ErrorHandler()
 
 
 def get_next_token_func():
