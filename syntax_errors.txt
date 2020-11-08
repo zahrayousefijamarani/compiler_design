@@ -1,1 +1,4 @@
-#9 : Syntax Error, Missing else
+#19 : Syntax Error, Missing ]
+#19 : Syntax Error, Missing ;
+#19 : Syntax Error, Illegal )
+#19 : Syntax Error, Illegal ]
