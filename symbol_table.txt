@@ -8,9 +8,9 @@
 8.	default
 9.	case
 10.	return
-11.	a
-12.	b
-13.	main
-14.	c
-15.	d
+11.	main
+12.	arr
+13.	arrsize
+14.	i
+15.	j
 16.	output

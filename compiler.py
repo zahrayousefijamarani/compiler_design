@@ -41,8 +41,8 @@ parse_table = {
 
     ('FunDeclarationPrime', '('): ["(", "Params", ")", "CompoundStmt"],
 
-    ('TypeSpecifier', 'int'): ["int", "#push1"],
-    ('TypeSpecifier', 'void'): ["void", "#push2"],
+    ('TypeSpecifier', 'int'): ["int", "#push_plus"],
+    ('TypeSpecifier', 'void'): ["void", "#push_minus"],
 
     ('Params', 'int'): ["int", "#push_int", "#pid", "ID", "ParamPrime", "ParamList"],
     ('Params', 'void'): ["void", "ParamListVoidAbtar"],
@@ -163,8 +163,8 @@ parse_table = {
     ('C', '<'): ["Relop", "AdditiveExpression", "#compare"],
     ('C', '=='): ["Relop", "AdditiveExpression", "#compare"],
 
-    ('Relop', '<'): ["<", "#push1"],
-    ('Relop', '=='): ["==", "#push2"],
+    ('Relop', '<'): ["<", "#push_plus"],
+    ('Relop', '=='): ["==", "#push_minus"],
 
     ('AdditiveExpression', '+'): ["Term", "D"],
     ('AdditiveExpression', '-'): ["Term", "D"],
@@ -187,8 +187,8 @@ parse_table = {
     ('D', '+'): ["Addop", "Term", "#add", "D"],
     ('D', '-'): ["Addop", "Term", "#add", "D"],
 
-    ('Addop', '+'): ["+", "#push1"],
-    ('Addop', '-'): ["-", "#push2"],
+    ('Addop', '+'): ["+", "#push_plus"],
+    ('Addop', '-'): ["-", "#push_minus"],
 
     ('Term', '+'): ["SignedFactor", "G"],
     ('Term', '-'): ["SignedFactor", "G"],
@@ -637,7 +637,7 @@ def get_temp_var():
 
 
 def findadrr(var_name):
-    print(var_name)
+    # print(var_name)
     return symbol_table.get(var_name)['address']
 
 
@@ -675,7 +675,7 @@ class CodeGen:
         self.i += 1
         self.ss.pop(2)
 
-    def pnum(self,var,  *args):
+    def pnum(self, var, *args):
         self.ss.push(f'#{var}')
 
     def array_dec(self, *args):
@@ -683,17 +683,20 @@ class CodeGen:
         if '#' in s:
             s = int(s[1:])
         for i in range(int(s)):
-            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})'
+            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})' # !!!size of word
             self.i += 1
-        # increase_data_pointer(s - 1)
+        l = list(symbol_table.items())
+        print(l[-1])
+        symbol_table[l[-1][0]]['address'] += s - 1
+        print(symbol_table[l[-1][0]])
 
-    def push1(self, *args):
+    def push_plus(self, *args):
         self.ss.push(1)
 
-    def push2(self, *args):
+    def push_minus(self, *args):
         self.ss.push(2)
 
-    def push_int(self, var,*args):
+    def push_int(self, var, *args):
         self.ss.push(f'#{var}')
 
     def save(self, *args):
@@ -729,8 +732,7 @@ class CodeGen:
 
     def fix_address_of_array(self, *args):
         t = get_temp_var()
-        offset, base = self.ss.top(), self.ss.top(2)
-        self.pb[self.i] = f'(ADD, #{base}, {offset}, {t})'
+        self.pb[self.i] = f'(ADD, #{self.ss.top(2)}, {self.ss.top()}, {t})'
         self.i += 1
         self.ss.pop(2)
         self.ss.push(f'@{t}')
@@ -908,5 +910,5 @@ start_func()
 with open('output.txt', 'w') as f:
     for i, code in enumerate(code_gen.pb):
         if code:
-            print(code)
+            # print(code)
             f.write(f'{i}\t{code}\n')
