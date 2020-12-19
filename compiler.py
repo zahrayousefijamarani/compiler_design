@@ -1,14 +1,21 @@
 # zahra yousefi jamarani  97102717
 # reza amini majd 97101275
+
 input_file = ""
 input_index = 0
 lineno = 1  # represent line in code (will be ++ after \n)
 symbol_table = ["if", "else", "void", "int", "while", "break", "switch",
                 "default", "case", "return"]
+symbol_table = {token: {'token': token, 'address': 0} for token in
+                symbol_table}
+
 key_words = ["if", "else", "void", "int", "while", "break", "switch",
              "default", "case", "return"]
 simple_symbols = [";", ",", ":", "[", "]", "(", ")", "{", "}", "+", "-", "<"]
 whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
+
+data_index = 100
+temp_index = 1000
 
 parse_table = {
     ('Program', '$'): ["$"],
@@ -83,25 +90,26 @@ parse_table = {
 
     ('ExpressionStmt', 'break'): ["break", ";"],
     ('ExpressionStmt', ';'): [";"],
-    ('ExpressionStmt', 'ID'): ["Expression", ";"],
-    ('ExpressionStmt', '+'): ["Expression", ";"],
-    ('ExpressionStmt', '-'): ["Expression", ";"],
-    ('ExpressionStmt', '('): ["Expression", ";"],
-    ('ExpressionStmt', 'NUM'): ["Expression", ";"],
+    ('ExpressionStmt', 'ID'): ["Expression", "#pop", ";"],
+    ('ExpressionStmt', '+'): ["Expression", "#pop", ";"],
+    ('ExpressionStmt', '-'): ["Expression", "#pop", ";"],
+    ('ExpressionStmt', '('): ["Expression", "#pop", ";"],
+    ('ExpressionStmt', 'NUM'): ["Expression", "#pop", ";"],
 
-    ('SelectionStmt', 'if'): ["if", "(", "Expression", ")", "Statement",
-                              "else", "Statement"],
+    ('SelectionStmt', 'if'): ["if", "(", "Expression", "#save", ")",
+                              "Statement", "#compare_if", "else", "Statement"],
 
-    ('IterationStmt', 'while'): ["while", "(", "Expression", ")", "Statement"],
+    ('IterationStmt', 'while'): ["while", "(", "#label", "Expression", "#save",
+                                 ")", "Statement", "#compare_if", "#jp"],
 
     ('ReturnStmt', 'return'): ["return", "ReturnStmtPrime"],
 
     ('ReturnStmtPrime', ';'): [";"],
-    ('ReturnStmtPrime', 'ID'): ["Expression", ";"],
-    ('ReturnStmtPrime', '+'): ["Expression", ";"],
-    ('ReturnStmtPrime', '-'): ["Expression", ";"],
-    ('ReturnStmtPrime', '('): ["Expression", ";"],
-    ('ReturnStmtPrime', 'NUM'): ["Expression", ";"],
+    ('ReturnStmtPrime', 'ID'): ["Expression", "#pop", ";"],
+    ('ReturnStmtPrime', '+'): ["Expression", "#pop", ";"],
+    ('ReturnStmtPrime', '-'): ["Expression", "#pop", ";"],
+    ('ReturnStmtPrime', '('): ["Expression", "#pop", ";"],
+    ('ReturnStmtPrime', 'NUM'): ["Expression", "#pop", ";"],
 
     ('SwitchStmt', 'switch'): ["switch", "(", "Expression", ")", "{",
                                "CaseStmts", "DefaultStmt", "}"],
@@ -114,14 +122,14 @@ parse_table = {
     ('DefaultStmt', 'default'): ["default", ":", "StatementList"],
     ('DefaultStmt', 'ε'): ["ε"],
 
-    ('Expression', 'ID'): ["ID", "B"],
-    ('Expression', '+'): ["SimpleExpressionZegond"],
-    ('Expression', '-'): ["SimpleExpressionZegond"],
-    ('Expression', '('): ["SimpleExpressionZegond"],
-    ('Expression', 'NUM'): ["SimpleExpressionZegond"],
+    ('Expression', 'ID'): ["#pid", "ID", "B"],
+    ('Expression', '+'): ["#reserve_temp", "SimpleExpressionZegond"],
+    ('Expression', '-'): ["#reserve_temp", "SimpleExpressionZegond"],
+    ('Expression', '('): ["#reserve_temp", "SimpleExpressionZegond"],
+    ('Expression', 'NUM'): ["#reserve_temp", "SimpleExpressionZegond"],
 
-    ('B', '='): ["=", "Expression"],
-    ('B', '['): ["[", "Expression", "]", "H"],
+    ('B', '='): ["=", "Expression", "#assign_1"],
+    ('B', '['): ["[", "Expression", "#add_temp_address", "]", "H"],
     ('B', '('): ["SimpleExpressionPrime"],
     ('B', '*'): ["SimpleExpressionPrime"],
     ('B', '+'): ["SimpleExpressionPrime"],
@@ -130,7 +138,7 @@ parse_table = {
     ('B', '=='): ["SimpleExpressionPrime"],
     ('B', 'ε'): ["SimpleExpressionPrime"],
 
-    ('H', '='): ["=", "Expression"],
+    ('H', '='): ["=", "Expression", "#assign_1"],
     ('H', '*'): ["G", "D", "C"],
     ('H', 'ε'): ["G", "D", "C"],
     ('H', '+'): ["G", "D", "C"],
@@ -152,17 +160,17 @@ parse_table = {
     ('SimpleExpressionPrime', 'ε'): ["AdditiveExpressionPrime", "C"],
 
     ('C', 'ε'): ["ε"],
-    ('C', '<'): ["Relop", "AdditiveExpression"],
-    ('C', '=='): ["Relop", "AdditiveExpression"],
+    ('C', '<'): ["Relop", "AdditiveExpression", "#compare"],
+    ('C', '=='): ["Relop", "AdditiveExpression", "#compare"],
 
-    ('Relop', '<'): ["<"],
-    ('Relop', '=='): ["=="],
+    ('Relop', '<'): ["<", "#save_mark"],
+    ('Relop', '=='): ["==", "#save_mark"],
 
-    ('AdditiveExpression', '+'): ["Term", "D"],
-    ('AdditiveExpression', '-'): ["Term", "D"],
-    ('AdditiveExpression', '('): ["Term", "D"],
-    ('AdditiveExpression', 'ID'): ["Term", "D"],
-    ('AdditiveExpression', 'NUM'): ["Term", "D"],
+    ('AdditiveExpression', '+'): ["#reserve_temp", "Term", "D"],
+    ('AdditiveExpression', '-'): ["#reserve_temp", "Term", "D"],
+    ('AdditiveExpression', '('): ["#reserve_temp", "Term", "D"],
+    ('AdditiveExpression', 'ID'): ["#reserve_temp", "Term", "D"],
+    ('AdditiveExpression', 'NUM'): ["#reserve_temp", "Term", "D"],
 
     ('AdditiveExpressionPrime', '('): ["TermPrime", "D"],
     ('AdditiveExpressionPrime', '*'): ["TermPrime", "D"],
@@ -176,11 +184,11 @@ parse_table = {
     ('AdditiveExpressionZegond', 'NUM'): ["TermZegond", "D"],
 
     ('D', 'ε'): ["ε"],
-    ('D', '+'): ["Addop", "Term", "D"],
-    ('D', '-'): ["Addop", "Term", "D"],
+    ('D', '+'): ["Addop", "#reserve_temp", "Term", "#add", "D"],
+    ('D', '-'): ["Addop", "#reserve_temp", "Term", "#add", "D"],
 
-    ('Addop', '+'): ["+"],
-    ('Addop', '-'): ["-"],
+    ('Addop', '+'): ["#save_mark", "+"],
+    ('Addop', '-'): ["#save_mark", "-"],
 
     ('Term', '+'): ["SignedFactor", "G"],
     ('Term', '-'): ["SignedFactor", "G"],
@@ -197,11 +205,11 @@ parse_table = {
     ('TermZegond', '('): ["SignedFactorZegond", "G"],
     ('TermZegond', 'NUM'): ["SignedFactorZegond", "G"],
 
-    ('G', '*'): ["*", "SignedFactor", "G"],
+    ('G', '*'): ["*", "#reserve_temp", "SignedFactor", "#multiply", "G"],
     ('G', 'ε'): ["ε"],
 
     ('SignedFactor', '+'): ["+", "Factor"],
-    ('SignedFactor', '-'): ["-", "Factor"],
+    ('SignedFactor', '-'): ["-", "Factor", "#negate_temp"],
     ('SignedFactor', '('): ["Factor"],
     ('SignedFactor', 'ID'): ["Factor"],
     ('SignedFactor', 'NUM'): ["Factor"],
@@ -210,13 +218,13 @@ parse_table = {
     ('SignedFactorPrime', 'ε'): ["FactorPrime"],
 
     ('SignedFactorZegond', '+'): ["+", "Factor"],
-    ('SignedFactorZegond', '-'): ["-", "Factor"],
+    ('SignedFactorZegond', '-'): ["-", "Factor", "#negate_temp"],
     ('SignedFactorZegond', '('): ["FactorZegond"],
     ('SignedFactorZegond', 'NUM'): ["FactorZegond"],
 
-    ('Factor', '('): ["(", "Expression", ")"],
+    ('Factor', '('): ["(", "Expression", ")", "#save_temp_in_last"],
     ('Factor', 'ID'): ["ID", "VarCallPrime"],
-    ('Factor', 'NUM'): ["NUM"],
+    ('Factor', 'NUM'): ["NUM", "#put_in_temp"],
 
     ('VarCallPrime', '('): ["(", "Args", ")"],
     ('VarCallPrime', '['): ["VarPrime"],
@@ -228,8 +236,8 @@ parse_table = {
     ('FactorPrime', '('): ["(", "Args", ")"],
     ('FactorPrime', 'ε'): ["ε"],
 
-    ('FactorZegond', '('): ["(", "Expression", ")"],
-    ('FactorZegond', 'NUM'): ["NUM"],
+    ('FactorZegond', '('): ["(", "Expression", ")", "#save_temp_in_last"],
+    ('FactorZegond', 'NUM'): ["NUM", "#put_in_temp"],
 
     ('Args', 'ε'): ["ε"],
     ('Args', 'ID'): ["ArgList"],
@@ -578,11 +586,14 @@ def get_next_token_func():
 
 
 def return_keyword_id(token):
+    global data_index
+
     if token in key_words:
         return token, "KEYWORD"
     else:
         if token not in symbol_table:
-            symbol_table.append(token)
+            symbol_table[token] = {'token': token, 'address': data_index}
+            data_index += 4
         return "ID", token
 
 
@@ -618,6 +629,131 @@ def get_next_token():
         return "$", "$"
 
 
+def get_temp_var():
+    global temp_index
+
+    temp_index += 4
+    return temp_index
+
+
+def findadrr(var_name):
+    print(var_name)
+    return symbol_table.get(var_name)['address']
+
+
+class SemanticStack:
+
+    def __init__(self):
+        self.stack = []
+
+    def pop(self, count=1):
+        for i in range(count):
+            self.stack.pop()
+
+    def push(self, element):
+        self.stack.append(element)
+
+    def top(self, count=1):
+        return self.stack[len(self.stack) - count]
+
+
+class CodeGen:
+    def __init__(self):
+        self.pb = [''] * 10000
+        self.i = 0
+        self.ss = SemanticStack()
+
+    def generate(self, action, input_):
+        return getattr(self, action)(input_)
+
+    def pop(self, *args):
+        self.ss.pop()
+
+    def save(self, *args):
+        self.ss.push(self.i)
+        self.i += 1
+
+    def compare_if(self, *args):
+        self.pb[self.ss.top()] = f'(JPF, {self.ss.top(2)}, {self.i},)'
+        self.ss.pop(2)
+
+    def label(self, *args):
+        self.ss.push(self.i)
+
+    def jp(self, *args):
+        self.pb[self.i] = f'(JP, {self.ss.top()}, ,)'
+        self.i += 1
+        self.ss.pop()
+
+    def reserve_temp(self, *args):
+        t = get_temp_var()
+        self.ss.push(t)
+
+    def pid(self, var):
+        p = findadrr(var)
+        self.ss.push(p)
+
+    def assign_1(self, *args):
+        self.pb[self.i] = f'(ASSIGN, {self.ss.top()}, {self.ss.top(2)},)'
+        self.ss.pop()
+        self.i += 1
+
+    def add_temp_address(self, *args):
+        pass
+
+    def save_mark(self, mark, *args):
+        self.ss.push(mark)
+
+    def compare(self, *args):
+        if self.ss.top(2) == '==':
+            self.pb[
+                self.i] = f'(EQ, {self.ss.top()}, {self.ss.top(3)}, {self.ss.top(3)})'
+            self.i += 1
+            self.ss.pop(2)
+        elif self.ss.top(2) == '<':
+            self.pb[
+                self.i] = f'(LT, {self.ss.top(3)}, {self.ss.top()}, {self.ss.top(3)})'
+            self.i += 1
+            self.ss.pop(2)
+
+    def add(self, *args):
+        if self.ss.top(2) == '+':
+            self.pb[
+                self.i] = f'(ADD, {self.ss.top()}, {self.ss.top(3)}, {self.ss.top(3)})'
+            self.i += 1
+            self.ss.pop(2)
+        elif self.ss.top(2) == '-':
+            self.pb[
+                self.i] = f'(SUB, {self.ss.top()}, {self.ss.top(3)}, {self.ss.top(3)})'
+            self.i += 1
+            self.ss.pop(2)
+
+    def multiply(self, *args):
+        self.pb[
+            self.i] = f'(MULT, {self.ss.top()}, {self.ss.top(2)}, {self.ss.top(2)})'
+        self.i += 1
+        self.ss.pop()
+
+    def negate_temp(self, *args):
+        t = get_temp_var()
+        self.pb[self.i] = f'(ASSIGN, #0, {t},)'
+        self.pb[self.i + 1] = f'(SUB, {t}, {self.ss.top()}, {self.ss.top()})'
+        self.i += 2
+
+    def save_temp_in_last(self, *args):
+        self.pb[self.i] = f'(ASSIGN, {self.ss.top()}, {self.ss.top(2)},)'
+        self.i += 1
+        self.ss.pop()
+
+    def put_in_temp(self, var, *args):
+        t = get_temp_var()
+        self.pb[self.i] = f'(ASSIGN, #{var}, {self.ss.top()},)'
+        self.i += 1
+
+
+code_gen = CodeGen()
+
+
 def start_func(input_file_name="input.txt"):
     global input_file, lineno
     try:
@@ -638,6 +774,9 @@ def start_func(input_file_name="input.txt"):
 
         # print(token)
         # print("====================")
+
+        if '#' in top_stack[1]:
+            code_gen.generate(top_stack[1][1:], token[1])
 
         if top_stack[1] == "$":
             if token[0] == "$":
@@ -722,9 +861,9 @@ def add_to_parse_table(grammar, file):
 
 def end_func():
     symbol_file = open("symbol_table.txt", "w+")
-    for i in range(0, len(symbol_table)):
-        symbol_file.write(str(i + 1) + ".	" + symbol_table[i])
-        if i != len(symbol_table) - 1:
+    for i in range(0, len(symbol_table.keys())):
+        symbol_file.write(str(i + 1) + ".	" + list(symbol_table.keys())[i])
+        if i != len(symbol_table.keys()) - 1:
             symbol_file.write("\n")
     symbol_file.close()
     error_handler.close_file()
@@ -732,3 +871,9 @@ def end_func():
 
 
 start_func()
+
+with open('output.txt', 'w') as f:
+    for i, code in enumerate(code_gen.pb):
+        if code:
+            print(code)
+            f.write(f'{i}\t{code}\n')
