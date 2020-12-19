@@ -681,8 +681,8 @@ class CodeGen:
     def array_dec(self, *args):
         s = self.ss.top()
         if '#' in s:
-            size = int(s[1:])
-        for i in range(int(size)):
+            s = int(s[1:])
+        for i in range(int(s)):
             self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})'
             self.i += 1
         # increase_data_pointer(s - 1)
@@ -753,12 +753,12 @@ class CodeGen:
         t = get_temp_var()
         if self.ss.top(2) == 2:
             self.pb[
-                self.i] = f'(SUB, {self.ss.top()}, {self.ss.top(3)}, {t})'
+                self.i] = f'(SUB, {self.ss.top(3)}, {self.ss.top()}, {t})'
             self.i += 1
             self.ss.pop(3)
         else:
             self.pb[
-                self.i] = f'(ADD, {self.ss.top()}, {self.ss.top(3)}, {t})'
+                self.i] = f'(ADD, {self.ss.top(3)}, {self.ss.top()}, {t})'
             self.i += 1
             self.ss.pop(3)
         self.ss.push(t)
