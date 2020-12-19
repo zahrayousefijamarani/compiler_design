@@ -29,25 +29,25 @@ parse_table = {
     ('Declaration', 'int'): ["DeclarationInitial", "DeclarationPrime"],
     ('Declaration', 'void'): ["DeclarationInitial", "DeclarationPrime"],
 
-    ('DeclarationInitial', 'int'): ["TypeSpecifier", "ID"],
-    ('DeclarationInitial', 'void'): ["TypeSpecifier", "ID"],
+    ('DeclarationInitial', 'int'): ["TypeSpecifier", "#pid", "ID"],
+    ('DeclarationInitial', 'void'): ["TypeSpecifier", "#pid", "ID"],
 
     ('DeclarationPrime', '('): ["FunDeclarationPrime"],
     ('DeclarationPrime', ';'): ["VarDeclarationPrime"],
     ('DeclarationPrime', '['): ["VarDeclarationPrime"],
 
-    ('VarDeclarationPrime', ';'): [";"],
-    ('VarDeclarationPrime', '['): ["[", "NUM", "]", ";"],
+    ('VarDeclarationPrime', ';'): [";", "#var_dec"],
+    ('VarDeclarationPrime', '['): ["[", "#pnum", "NUM", "]", ";", "#array_dec"],
 
     ('FunDeclarationPrime', '('): ["(", "Params", ")", "CompoundStmt"],
 
-    ('TypeSpecifier', 'int'): ["int"],
-    ('TypeSpecifier', 'void'): ["void"],
+    ('TypeSpecifier', 'int'): ["int", "#push1"],
+    ('TypeSpecifier', 'void'): ["void", "#push2"],
 
-    ('Params', 'int'): ["int", "ID", "ParamPrime", "ParamList"],
+    ('Params', 'int'): ["int", "#push_int", "#pid", "ID", "ParamPrime", "ParamList"],
     ('Params', 'void'): ["void", "ParamListVoidAbtar"],
 
-    ('ParamListVoidAbtar', 'ID'): ["ID", "ParamPrime", "ParamList"],
+    ('ParamListVoidAbtar', 'ID'): ["#pid", "ID", "ParamPrime", "ParamList"],
     ('ParamListVoidAbtar', 'ε'): ["ε"],
 
     ('ParamList', ','): [",", "Param", "ParamList"],
@@ -97,10 +97,10 @@ parse_table = {
     ('ExpressionStmt', 'NUM'): ["Expression", "#pop", ";"],
 
     ('SelectionStmt', 'if'): ["if", "(", "Expression", "#save", ")",
-                              "Statement", "#compare_if", "else", "Statement"],
+                              "Statement", "#jpf_save", "else", "Statement", "#jp"],
 
     ('IterationStmt', 'while'): ["while", "(", "#label", "Expression", "#save",
-                                 ")", "Statement", "#compare_if", "#jp"],
+                                 ")", "Statement", "#while_sym"],
 
     ('ReturnStmt', 'return'): ["return", "ReturnStmtPrime"],
 
@@ -123,13 +123,13 @@ parse_table = {
     ('DefaultStmt', 'ε'): ["ε"],
 
     ('Expression', 'ID'): ["#pid", "ID", "B"],
-    ('Expression', '+'): ["#reserve_temp", "SimpleExpressionZegond"],
-    ('Expression', '-'): ["#reserve_temp", "SimpleExpressionZegond"],
-    ('Expression', '('): ["#reserve_temp", "SimpleExpressionZegond"],
-    ('Expression', 'NUM'): ["#reserve_temp", "SimpleExpressionZegond"],
+    ('Expression', '+'): ["SimpleExpressionZegond"],
+    ('Expression', '-'): ["SimpleExpressionZegond"],
+    ('Expression', '('): ["SimpleExpressionZegond"],
+    ('Expression', 'NUM'): ["SimpleExpressionZegond"],
 
-    ('B', '='): ["=", "Expression", "#assign_1"],
-    ('B', '['): ["[", "Expression", "#add_temp_address", "]", "H"],
+    ('B', '='): ["=", "Expression", "#assign"],
+    ('B', '['): ["[", "Expression", "]", "#fix_address_of_array", "H"],
     ('B', '('): ["SimpleExpressionPrime"],
     ('B', '*'): ["SimpleExpressionPrime"],
     ('B', '+'): ["SimpleExpressionPrime"],
@@ -138,7 +138,7 @@ parse_table = {
     ('B', '=='): ["SimpleExpressionPrime"],
     ('B', 'ε'): ["SimpleExpressionPrime"],
 
-    ('H', '='): ["=", "Expression", "#assign_1"],
+    ('H', '='): ["=", "Expression", "#assign"],
     ('H', '*'): ["G", "D", "C"],
     ('H', 'ε'): ["G", "D", "C"],
     ('H', '+'): ["G", "D", "C"],
@@ -163,14 +163,14 @@ parse_table = {
     ('C', '<'): ["Relop", "AdditiveExpression", "#compare"],
     ('C', '=='): ["Relop", "AdditiveExpression", "#compare"],
 
-    ('Relop', '<'): ["<", "#save_mark"],
-    ('Relop', '=='): ["==", "#save_mark"],
+    ('Relop', '<'): ["<", "#push1"],
+    ('Relop', '=='): ["==", "#push2"],
 
-    ('AdditiveExpression', '+'): ["#reserve_temp", "Term", "D"],
-    ('AdditiveExpression', '-'): ["#reserve_temp", "Term", "D"],
-    ('AdditiveExpression', '('): ["#reserve_temp", "Term", "D"],
-    ('AdditiveExpression', 'ID'): ["#reserve_temp", "Term", "D"],
-    ('AdditiveExpression', 'NUM'): ["#reserve_temp", "Term", "D"],
+    ('AdditiveExpression', '+'): ["Term", "D"],
+    ('AdditiveExpression', '-'): ["Term", "D"],
+    ('AdditiveExpression', '('): ["Term", "D"],
+    ('AdditiveExpression', 'ID'): ["Term", "D"],
+    ('AdditiveExpression', 'NUM'): ["Term", "D"],
 
     ('AdditiveExpressionPrime', '('): ["TermPrime", "D"],
     ('AdditiveExpressionPrime', '*'): ["TermPrime", "D"],
@@ -184,11 +184,11 @@ parse_table = {
     ('AdditiveExpressionZegond', 'NUM'): ["TermZegond", "D"],
 
     ('D', 'ε'): ["ε"],
-    ('D', '+'): ["Addop", "#reserve_temp", "Term", "#add", "D"],
-    ('D', '-'): ["Addop", "#reserve_temp", "Term", "#add", "D"],
+    ('D', '+'): ["Addop", "Term", "#add", "D"],
+    ('D', '-'): ["Addop", "Term", "#add", "D"],
 
-    ('Addop', '+'): ["#save_mark", "+"],
-    ('Addop', '-'): ["#save_mark", "-"],
+    ('Addop', '+'): ["+", "#push1"],
+    ('Addop', '-'): ["-", "#push2"],
 
     ('Term', '+'): ["SignedFactor", "G"],
     ('Term', '-'): ["SignedFactor", "G"],
@@ -205,11 +205,11 @@ parse_table = {
     ('TermZegond', '('): ["SignedFactorZegond", "G"],
     ('TermZegond', 'NUM'): ["SignedFactorZegond", "G"],
 
-    ('G', '*'): ["*", "#reserve_temp", "SignedFactor", "#multiply", "G"],
+    ('G', '*'): ["*", "SignedFactor", "#multiply", "G"],
     ('G', 'ε'): ["ε"],
 
     ('SignedFactor', '+'): ["+", "Factor"],
-    ('SignedFactor', '-'): ["-", "Factor", "#negate_temp"],
+    ('SignedFactor', '-'): ["-", "Factor", "#negative"],
     ('SignedFactor', '('): ["Factor"],
     ('SignedFactor', 'ID'): ["Factor"],
     ('SignedFactor', 'NUM'): ["Factor"],
@@ -218,26 +218,26 @@ parse_table = {
     ('SignedFactorPrime', 'ε'): ["FactorPrime"],
 
     ('SignedFactorZegond', '+'): ["+", "Factor"],
-    ('SignedFactorZegond', '-'): ["-", "Factor", "#negate_temp"],
+    ('SignedFactorZegond', '-'): ["-", "Factor", "#negative"],
     ('SignedFactorZegond', '('): ["FactorZegond"],
     ('SignedFactorZegond', 'NUM'): ["FactorZegond"],
 
-    ('Factor', '('): ["(", "Expression", ")", "#save_temp_in_last"],
-    ('Factor', 'ID'): ["ID", "VarCallPrime"],
-    ('Factor', 'NUM'): ["NUM", "#put_in_temp"],
+    ('Factor', '('): ["(", "Expression", ")"],
+    ('Factor', 'ID'): ["#pid", "ID", "VarCallPrime"],
+    ('Factor', 'NUM'): ["#pnum", "NUM"],
 
     ('VarCallPrime', '('): ["(", "Args", ")"],
     ('VarCallPrime', '['): ["VarPrime"],
     ('VarCallPrime', 'ε'): ["VarPrime"],
 
-    ('VarPrime', '['): ["[", "Expression", "]"],
+    ('VarPrime', '['): ["[", "Expression", "]", "#fix_address_of_array"],
     ('VarPrime', 'ε'): ["ε"],
 
-    ('FactorPrime', '('): ["(", "Args", ")"],
+    ('FactorPrime', '('): ["(", "Args", "#output", ")"],
     ('FactorPrime', 'ε'): ["ε"],
 
-    ('FactorZegond', '('): ["(", "Expression", ")", "#save_temp_in_last"],
-    ('FactorZegond', 'NUM'): ["NUM", "#put_in_temp"],
+    ('FactorZegond', '('): ["(", "Expression", ")"],
+    ('FactorZegond', 'NUM'): ["#pnum", "NUM"],
 
     ('Args', 'ε'): ["ε"],
     ('Args', 'ID'): ["ArgList"],
@@ -666,88 +666,123 @@ class CodeGen:
     def generate(self, action, input_):
         return getattr(self, action)(input_)
 
-    def pop(self, *args):
-        self.ss.pop()
+    def pid(self, var):
+        p = findadrr(var)
+        self.ss.push(p)
+
+    def var_dec(self, *args):
+        self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top()},)'
+        self.i += 1
+        self.ss.pop(2)
+
+    def pnum(self, *args):
+        input = args.get('input')
+        self.ss.push(f'#{input}')
+
+    def array_dec(self, *args):
+        s = self.ss.top()
+        if '#' in s:
+            size = int(s[1:])
+        for i in range(int(size)):
+            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})'
+            self.i += 1
+        increase_data_pointer(s - 1)
+
+    def push1(self, *args):
+        self.ss.push(1)
+
+    def push2(self, *args):
+        self.ss.push(2)
+
+    def push_int(self, *args):
+        input = args.get('int')
+        self.ss.push(f'#{input}')
 
     def save(self, *args):
         self.ss.push(self.i)
         self.i += 1
 
-    def compare_if(self, *args):
-        self.pb[self.ss.top()] = f'(JPF, {self.ss.top(2)}, {self.i},)'
+    def jpf_save(self, *args):
+        self.pb[self.ss.top()] = f'(JPF, {self.ss.top(2)}, {self.i + 1},)'
         self.ss.pop(2)
+        self.ss.push(self.i)
+        self.i += 1
 
     def label(self, *args):
         self.ss.push(self.i)
 
-    def jp(self, *args):
-        self.pb[self.i] = f'(JP, {self.ss.top()}, ,)'
+    def while_sym(self, *args):
+        self.pb[self.ss.top()] = f'(JPF, {self.ss.top(2)}, {self.i + 1},)'
+        self.pb[self.i] = f'(JP, {self.ss.top(3)}, ,)'
         self.i += 1
+        self.ss.pop(3)
+
+    def jp(self, *args):
+        self.pb[self.ss.top()] = f'(JP, {self.i}, ,)'
         self.ss.pop()
 
-    def reserve_temp(self, *args):
-        t = get_temp_var()
-        self.ss.push(t)
+    def pop(self, *args):
+        self.ss.pop()
 
-    def pid(self, var):
-        p = findadrr(var)
-        self.ss.push(p)
-
-    def assign_1(self, *args):
+    def assign(self, *args):
         self.pb[self.i] = f'(ASSIGN, {self.ss.top()}, {self.ss.top(2)},)'
         self.ss.pop()
         self.i += 1
 
-    def add_temp_address(self, *args):
-        pass
-
-    def save_mark(self, mark, *args):
-        self.ss.push(mark)
+    def fix_address_of_array(self, *args):
+        t = get_temp_var()
+        offset, base = self.ss.top(), self.ss.top(2)
+        self.pb[self.i] = f'(ADD, #{base}, {offset}, {t})'
+        self.i += 1
+        self.ss.pop(2)
+        self.ss.push(f'@{t}')
 
     def compare(self, *args):
-        if self.ss.top(2) == '==':
+        t = get_temp_var()
+        if self.ss.top(2) == 1:
             self.pb[
-                self.i] = f'(EQ, {self.ss.top()}, {self.ss.top(3)}, {self.ss.top(3)})'
+                self.i] = f'(LT, {self.ss.top(3)}, {self.ss.top()}, {t})'
             self.i += 1
-            self.ss.pop(2)
-        elif self.ss.top(2) == '<':
+            self.ss.pop(3)
+        else:
             self.pb[
-                self.i] = f'(LT, {self.ss.top(3)}, {self.ss.top()}, {self.ss.top(3)})'
+                self.i] = f'(EQ, {self.ss.top()}, {self.ss.top(3)}, {t})'
             self.i += 1
-            self.ss.pop(2)
+            self.ss.pop(3)
+        self.ss.push(t)
 
     def add(self, *args):
-        if self.ss.top(2) == '+':
+        t = get_temp_var()
+        if self.ss.top(2) == 2:
             self.pb[
-                self.i] = f'(ADD, {self.ss.top()}, {self.ss.top(3)}, {self.ss.top(3)})'
+                self.i] = f'(SUB, {self.ss.top()}, {self.ss.top(3)}, {t})'
             self.i += 1
-            self.ss.pop(2)
-        elif self.ss.top(2) == '-':
+            self.ss.pop(3)
+        else:
             self.pb[
-                self.i] = f'(SUB, {self.ss.top()}, {self.ss.top(3)}, {self.ss.top(3)})'
+                self.i] = f'(ADD, {self.ss.top()}, {self.ss.top(3)}, {t})'
             self.i += 1
-            self.ss.pop(2)
+            self.ss.pop(3)
+        self.ss.push(t)
 
     def multiply(self, *args):
+        t = get_temp_var()
         self.pb[
-            self.i] = f'(MULT, {self.ss.top()}, {self.ss.top(2)}, {self.ss.top(2)})'
+            self.i] = f'(MULT, {self.ss.top(2)}, {self.ss.top()}, {t})'
+        self.i += 1
+        self.ss.pop(2)
+        self.ss.push(t)
+
+    def negative(self, *args):
+        t = get_temp_var()
+        self.pb[self.i] = f'(SUB, #0, {self.ss.top()}, {t})'
         self.i += 1
         self.ss.pop()
+        self.ss.push(t)
 
-    def negate_temp(self, *args):
-        t = get_temp_var()
-        self.pb[self.i] = f'(ASSIGN, #0, {t},)'
-        self.pb[self.i + 1] = f'(SUB, {t}, {self.ss.top()}, {self.ss.top()})'
-        self.i += 2
-
-    def save_temp_in_last(self, *args):
-        self.pb[self.i] = f'(ASSIGN, {self.ss.top()}, {self.ss.top(2)},)'
-        self.i += 1
+    def output(self, *args):
+        self.pb[self.i] = f'(PRINT, {self.ss.top()}, ,)'
         self.ss.pop()
-
-    def put_in_temp(self, var, *args):
-        t = get_temp_var()
-        self.pb[self.i] = f'(ASSIGN, #{var}, {self.ss.top()},)'
         self.i += 1
 
 
