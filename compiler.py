@@ -663,8 +663,8 @@ class CodeGen:
         self.i = 0
         self.ss = SemanticStack()
 
-    def generate(self, action, input_):
-        return getattr(self, action)(input_)
+    def generate(self, action, input_var):
+        return getattr(self, action)(input_var)
 
     def pid(self, var):
         p = findadrr(var)
@@ -675,9 +675,8 @@ class CodeGen:
         self.i += 1
         self.ss.pop(2)
 
-    def pnum(self, *args):
-        input = args.get('input')
-        self.ss.push(f'#{input}')
+    def pnum(self,var,  *args):
+        self.ss.push(f'#{var}')
 
     def array_dec(self, *args):
         s = self.ss.top()
@@ -686,7 +685,7 @@ class CodeGen:
         for i in range(int(size)):
             self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})'
             self.i += 1
-        increase_data_pointer(s - 1)
+        # increase_data_pointer(s - 1)
 
     def push1(self, *args):
         self.ss.push(1)
@@ -694,9 +693,8 @@ class CodeGen:
     def push2(self, *args):
         self.ss.push(2)
 
-    def push_int(self, *args):
-        input = args.get('int')
-        self.ss.push(f'#{input}')
+    def push_int(self, var,*args):
+        self.ss.push(f'#{var}')
 
     def save(self, *args):
         self.ss.push(self.i)
@@ -879,8 +877,8 @@ def start_func(input_file_name="input.txt"):
             else:
                 error_handler.handle_parser_error(
                     lineno,
-                    ParserErrorType.MISSING,  # todo
-                    top_stack[1]  # todo
+                    ParserErrorType.MISSING,
+                    top_stack[1]
                 )
     parse_file.close()
     end_func()
