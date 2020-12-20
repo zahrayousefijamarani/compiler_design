@@ -679,16 +679,14 @@ class CodeGen:
         self.ss.push(f'#{var}')
 
     def array_dec(self, *args):
+        global data_index
         s = self.ss.top()
         if '#' in s:
             s = int(s[1:])
         for i in range(int(s)):
             self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})' # !!!size of word
             self.i += 1
-        l = list(symbol_table.items())
-        print(l[-1])
-        symbol_table[l[-1][0]]['address'] += s - 1
-        print(symbol_table[l[-1][0]])
+        data_index += (s-1) * 4
 
     def push_plus(self, *args):
         self.ss.push(1)
