@@ -1,25 +1,39 @@
-/*== T7  ==*/
-void main( void )
-{
-    int n;
-    int sum;
-    int i;
-    int t;
-    int a;
-    i = 1;
-    n = 501;
-    while(i < n)
-    {
-        t = i;
-        sum = 0;
-        while(0 < t)
-        {
-            while (0 < t) { t = t - 10; }
-            a = 10 - - t;
-            sum = sum + a * a * a;
-        }
-        if(sum == i) { output( i );} else {}
-        i = i + 1;
-    }
-
+/* === sample 9 ==== */
+int x[10];
+int minloc (  int a[],  int low,  int high 	)
+    {int i; int x;  int k;
+      k = low;
+      x = a[low];
+      i = low + 1;
+      while (i < high)
+          { if (a[i] < x)
+             { x= a[i];
+               k =  i; } else { }
+              i =  i + 1;
+           }
+            return k;
 }
+void sort( int a[], int low, int high)
+   { int i; int k;
+     i = low;
+     while (i < high-1)
+        { int  t;
+          k = minloc(a,i,high);
+          t = a[k];
+          a[k] = a[i];
+          a[i] =  t;
+          i = i+1;
+           }
+      }
+void main(void)
+     {  int i;
+       i = 0;
+       while (i < 10)
+         { x[i] =  i * i;
+           i = i + 1; }
+           sort(x,0,10);
+           i = 0;
+           while (i < 10)
+              { output(x[i]);
+               i = i + 1;}
+     }

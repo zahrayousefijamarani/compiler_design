@@ -6,14 +6,15 @@ input_index = 0
 lineno = 1  # represent line in code (will be ++ after \n)
 symbol_table = ["if", "else", "void", "int", "while", "break", "switch",
                 "default", "case", "return"]
-symbol_table = {token: {'token': token, 'address': 0} for token in
+symbol_table = {(token, 0): {'token': token, 'address': 0, 'scope': 0} for token in
                 symbol_table}
-
+declaration = []
 key_words = ["if", "else", "void", "int", "while", "break", "switch",
              "default", "case", "return"]
 simple_symbols = [";", ",", ":", "[", "]", "(", ")", "{", "}", "+", "-", "<"]
 whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
-
+scope = 0
+function_names = []
 data_index = 100
 temp_index = 1000
 
@@ -29,10 +30,10 @@ parse_table = {
     ('Declaration', 'int'): ["DeclarationInitial", "DeclarationPrime"],
     ('Declaration', 'void'): ["DeclarationInitial", "DeclarationPrime"],
 
-    ('DeclarationInitial', 'int'): ["TypeSpecifier", "#pid", "ID"],
-    ('DeclarationInitial', 'void'): ["TypeSpecifier", "#pid", "ID"],
+    ('DeclarationInitial', 'int'): ["TypeSpecifier", "#set_dec_flag", "#pid", "ID"],
+    ('DeclarationInitial', 'void'): ["TypeSpecifier", "#set_dec_flag", "#pid", "ID"],
 
-    ('DeclarationPrime', '('): ["FunDeclarationPrime"],
+    ('DeclarationPrime', '('): ["#function_dec", "FunDeclarationPrime"],
     ('DeclarationPrime', ';'): ["VarDeclarationPrime"],
     ('DeclarationPrime', '['): ["VarDeclarationPrime"],
 
@@ -44,10 +45,10 @@ parse_table = {
     ('TypeSpecifier', 'int'): ["int", "#push_plus"],
     ('TypeSpecifier', 'void'): ["void", "#push_minus"],
 
-    ('Params', 'int'): ["int", "#push_int", "#pid", "ID", "ParamPrime", "ParamList"],
+    ('Params', 'int'): ["int", "#set_dec_flag", "#pid", "ID", "#int_input_var", "ParamPrime", "ParamList"],
     ('Params', 'void'): ["void", "ParamListVoidAbtar"],
 
-    ('ParamListVoidAbtar', 'ID'): ["#pid", "ID", "ParamPrime", "ParamList"],
+    ('ParamListVoidAbtar', 'ID'): ["#set_dec_flag", "#pid", "ID", "#void_input_var", "ParamPrime", "ParamList"],
     ('ParamListVoidAbtar', 'ε'): ["ε"],
 
     ('ParamList', ','): [",", "Param", "ParamList"],
@@ -105,11 +106,11 @@ parse_table = {
     ('ReturnStmt', 'return'): ["return", "ReturnStmtPrime"],
 
     ('ReturnStmtPrime', ';'): [";"],
-    ('ReturnStmtPrime', 'ID'): ["Expression", "#pop", ";"],
-    ('ReturnStmtPrime', '+'): ["Expression", "#pop", ";"],
-    ('ReturnStmtPrime', '-'): ["Expression", "#pop", ";"],
-    ('ReturnStmtPrime', '('): ["Expression", "#pop", ";"],
-    ('ReturnStmtPrime', 'NUM'): ["Expression", "#pop", ";"],
+    ('ReturnStmtPrime', 'ID'): ["Expression", "#return_val", ";"],
+    ('ReturnStmtPrime', '+'): ["Expression", "#return_val", ";"],
+    ('ReturnStmtPrime', '-'): ["Expression", "#return_val", ";"],
+    ('ReturnStmtPrime', '('): ["Expression", "#return_val", ";"],
+    ('ReturnStmtPrime', 'NUM'): ["Expression", "#return_val", ";"],
 
     ('SwitchStmt', 'switch'): ["switch", "#tmp_save", "(", "Expression", ")", "{",
                                "CaseStmts", "DefaultStmt", " #jp_switch", "}"],
@@ -117,7 +118,7 @@ parse_table = {
     ('CaseStmts', 'ε'): ["ε"],
     ('CaseStmts', 'case'): ["CaseStmt", "CaseStmts"],
 
-    ('CaseStmt', 'case'): ["case","#pnum", "NUM", "#cmp_save",":", "StatementList", "#jpf"],
+    ('CaseStmt', 'case'): ["case", "#pnum", "NUM", "#cmp_save", ":", "StatementList", "#jpf"],
 
     ('DefaultStmt', 'default'): ["default", ":", "StatementList"],
     ('DefaultStmt', 'ε'): ["ε"],
@@ -226,7 +227,7 @@ parse_table = {
     ('Factor', 'ID'): ["#pid", "ID", "VarCallPrime"],
     ('Factor', 'NUM'): ["#pnum", "NUM"],
 
-    ('VarCallPrime', '('): ["(", "Args", ")"],
+    ('VarCallPrime', '('): ["(", "#push_func_sign", "Args", ")", "#function_call"],
     ('VarCallPrime', '['): ["VarPrime"],
     ('VarCallPrime', 'ε'): ["VarPrime"],
 
@@ -591,8 +592,8 @@ def return_keyword_id(token):
     if token in key_words:
         return token, "KEYWORD"
     else:
-        if token not in symbol_table:
-            symbol_table[token] = {'token': token, 'address': data_index}
+        if (token, scope) not in symbol_table:
+            symbol_table[(token, scope)] = {'token': token, 'address': data_index, 'scope': scope}
             data_index += 4
         return "ID", token
 
@@ -638,7 +639,27 @@ def get_temp_var():
 
 def findadrr(var_name):
     # print(var_name)
-    return symbol_table.get(var_name)['address']
+    a = symbol_table.get((var_name, scope))['address']  # local
+    if (var_name, scope) in declaration:
+        return a
+    return symbol_table.get((var_name, 0))['address']  # global
+
+
+class FunctionDec:
+    def __init__(self, name, address, return_val, start):
+        self.name = name
+        self.address = address
+        self.return_val = return_val
+        self.scope = scope
+        self.param_list = []
+        self.return_val_add = None
+        self.start = start
+
+    def add_param(self, param):
+        self.param_list.append(param)
+
+    def set_return_val_add(self, address):
+        self.return_val_add = address
 
 
 class SemanticStack:
@@ -670,6 +691,22 @@ class CodeGen:
         p = findadrr(var)
         self.ss.push(p)
 
+    def set_dec_flag(self, var):
+        declaration.append((var, scope))
+
+    def push_func_sign(self, *args):
+        self.ss.push("f")
+
+    def function_call(self, *args):
+        i = 1
+        param_list = []
+        while self.ss.top(i) != "f":
+            param_list.insert(0, self.ss.top(i))
+            i += 1
+        self.ss.pop(i)
+
+        # todo ss.top() is the name of func
+
     def var_dec(self, *args):
         self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top()},)'
         self.i += 1
@@ -687,6 +724,7 @@ class CodeGen:
             self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})'  # !!!size of word
             self.i += 1
         data_index += (s - 1) * 4
+        self.ss.pop(3)  # todo
 
     def push_plus(self, *args):
         self.ss.push(1)
@@ -805,10 +843,42 @@ class CodeGen:
         self.pb[self.i] = f'(JP, {self.ss.top(4)}, , )'
         self.i += 1
 
+    def function_dec(self, *args):
+        global scope
+        address = self.ss.top()
+        values = list(symbol_table.values())
+        name = ""
+        for i in range(0, len(values)):
+            if address == values[i]['address']:
+                name = values[i]['token']
+                break
+        return_val = "void"
+        if self.ss.top(2) == 1:
+            return_val = "int"
+        f = FunctionDec(name, address, return_val, self.i)
+        self.ss.pop(2)
+        function_names.append(f)
+        scope += 1
+
+    def void_input_var(self, *args):
+        function_names[-1].add_param((self.ss.top(), "void"))
+        self.ss.pop(1)
+
+    def int_input_var(self, *args):
+        function_names[-1].add_param((self.ss.top(), "int"))
+        self.ss.pop(1)
+
+    def return_val(self, *args):
+        function_names[-1].set_return_val_add(self.ss.top())
+        self.ss.pop(1)
+
     def output(self, *args):
         self.pb[self.i] = f'(PRINT, {self.ss.top()}, ,)'
         self.ss.pop()
         self.i += 1
+        print(self.ss.stack)
+        for i in function_names:
+            print(i.name)
 
 
 code_gen = CodeGen()
@@ -829,11 +899,7 @@ def start_func(input_file_name="input.txt"):
     while token is None:
         token = get_next_token()
     while len(grammar_stack) != 0:
-        # print(grammar_stack)
         top_stack = grammar_stack.pop()
-
-        # print(token)
-        # print("====================")
 
         if '#' in top_stack[1]:
             code_gen.generate(top_stack[1][1:], token[1])
@@ -922,7 +988,7 @@ def add_to_parse_table(grammar, file):
 def end_func():
     symbol_file = open("symbol_table.txt", "w+")
     for i in range(0, len(symbol_table.keys())):
-        symbol_file.write(str(i + 1) + ".	" + list(symbol_table.keys())[i])
+        symbol_file.write(str(i + 1) + ".	" + list(symbol_table.keys())[i][0])
         if i != len(symbol_table.keys()) - 1:
             symbol_file.write("\n")
     symbol_file.close()
@@ -935,5 +1001,4 @@ start_func()
 with open('output.txt', 'w') as f:
     for i, code in enumerate(code_gen.pb):
         if code:
-            # print(code)
             f.write(f'{i}\t{code}\n')
