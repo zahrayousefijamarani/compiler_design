@@ -642,7 +642,9 @@ def findadrr(var_name):
     a = symbol_table.get((var_name, scope))['address']  # local
     if (var_name, scope) in declaration:
         return a
-    return symbol_table.get((var_name, 0))['address']  # global
+    if (var_name, 0) in symbol_table:
+        return symbol_table.get((var_name, 0))['address']  # global
+    return a
 
 
 class FunctionDec:
