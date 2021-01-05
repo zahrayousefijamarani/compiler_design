@@ -88,7 +88,7 @@ parse_table = {
     ('Statement', '('): ["ExpressionStmt"],
     ('Statement', 'NUM'): ["ExpressionStmt"],
 
-    ('ExpressionStmt', 'break'): ["break", ";"],
+    ('ExpressionStmt', 'break'): ["break", "#jp_break", ";"],
     ('ExpressionStmt', ';'): [";"],
     ('ExpressionStmt', 'ID'): ["Expression", "#pop", ";"],
     ('ExpressionStmt', '+'): ["Expression", "#pop", ";"],
@@ -111,13 +111,13 @@ parse_table = {
     ('ReturnStmtPrime', '('): ["Expression", "#pop", ";"],
     ('ReturnStmtPrime', 'NUM'): ["Expression", "#pop", ";"],
 
-    ('SwitchStmt', 'switch'): ["switch", "(", "Expression", ")", "{",
-                               "CaseStmts", "DefaultStmt", "}"],
+    ('SwitchStmt', 'switch'): ["switch", "#tmp_save", "(", "Expression", ")", "{",
+                               "CaseStmts", "DefaultStmt", " #jp_switch", "}"],
 
     ('CaseStmts', 'ε'): ["ε"],
     ('CaseStmts', 'case'): ["CaseStmt", "CaseStmts"],
 
-    ('CaseStmt', 'case'): ["case", "NUM", ":", "StatementList"],
+    ('CaseStmt', 'case'): ["case","#pnum", "NUM", "#cmp_save",":", "StatementList", "#jpf"],
 
     ('DefaultStmt', 'default'): ["default", ":", "StatementList"],
     ('DefaultStmt', 'ε'): ["ε"],
@@ -684,9 +684,9 @@ class CodeGen:
         if '#' in s:
             s = int(s[1:])
         for i in range(int(s)):
-            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})' # !!!size of word
+            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})'  # !!!size of word
             self.i += 1
-        data_index += (s-1) * 4
+        data_index += (s - 1) * 4
 
     def push_plus(self, *args):
         self.ss.push(1)
@@ -777,6 +777,33 @@ class CodeGen:
         self.i += 1
         self.ss.pop()
         self.ss.push(t)
+
+    def temp_save(self, *args):
+        self.pb[self.i] = f'(JP, {self.i + 2}, , )'
+        self.i += 1
+        self.ss.push(self.i)
+        self.i += 1
+
+    def jp_switch(self, *args):
+        self.pb[self.ss.top()] = f'(JP, {self.i}, , )'
+        self.ss.pop(2)
+
+    def cmp_save(self, *args):
+        t = get_temp_var()
+        self.pb[self.i] = f'(EQ, #{self.ss.top()}, {self.ss.top(2)}, {t})'
+        self.i += 1
+        self.ss.pop(1)
+        self.ss.push(t)
+        self.ss.push(self.i)
+        self.i += 1
+
+    def jpf(self, *args):
+        self.pb[self.ss.top()] = f'(JPF, {self.ss.top(2)}, {self.i}, )'
+        self.ss.pop(2)
+
+    def jp_break(self, *args):
+        self.pb[self.i] = f'(JP, {self.ss.top(4)}, , )'
+        self.i += 1
 
     def output(self, *args):
         self.pb[self.i] = f'(PRINT, {self.ss.top()}, ,)'

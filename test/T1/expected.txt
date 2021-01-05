@@ -1,1 +1,4 @@
-PRINT    15
+PRINT    0
+PRINT    -2
+PRINT    10
+PRINT    8

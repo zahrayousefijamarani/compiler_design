@@ -1,9 +1,19 @@
-/*==== T2 =====*/
-void main(void){
+/*==== Sample 2 =====*/
+int foo(int x){
 	int a;
-	int b;
-	a = 10 * 2 + 3 * (1 < 0);
-	b = (a == 5) * 4 + 3;
-	output(a);
-	output(b);
+	a = 10;
+	output(x);
+	if(a < x){
+		return(-1);
+	}
+	else {
+		return(-2);
+	}
 }
+void main ( void )
+{
+	int i;
+	i = foo (4) ;
+	output (i);
+}
+

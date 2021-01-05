@@ -1,5 +1,1 @@
-PRINT    5
-PRINT    5
-PRINT    5
-PRINT    7
-PRINT    7
+PRINT    3

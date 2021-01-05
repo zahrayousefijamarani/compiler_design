@@ -1,14 +1,20 @@
-/*==== T3 ====*/
-void main(void) {
-	int arr[10];
-	int var1;
-	int var2;
-	var1 = 1;
-	arr[0] = var1 = var2 = 5;
-	output(var1); 
-	output(arr[0]);
-	arr[var1 = var2] = var2 = 7;
-	output(var1); 
-	output(var2); 
-	output(arr[5]);
+/*===== sample 3 =====*/
+void foo(int x){
+	switch(x){
+	case 0:
+		output(1);
+	case 1:
+		output(2);
+		break;
+	case 3:
+		output(3);
+		break;
+	default:
+		output(4);
+	}
 }
+void main ( void )
+{
+     foo (3) ;
+}
+
