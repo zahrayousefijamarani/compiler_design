@@ -17,6 +17,7 @@ scope = 0
 function_names = []
 data_index = 100
 temp_index = 1000
+main_faction_name = "main"
 
 parse_table = {
     ('Program', '$'): ["$"],
@@ -40,7 +41,7 @@ parse_table = {
     ('VarDeclarationPrime', ';'): [";", "#var_dec"],
     ('VarDeclarationPrime', '['): ["[", "#pnum", "NUM", "]", ";", "#array_dec"],
 
-    ('FunDeclarationPrime', '('): ["(", "Params", ")", "CompoundStmt"],
+    ('FunDeclarationPrime', '('): ["(", "Params", ")", "CompoundStmt", "#function_return"],
 
     ('TypeSpecifier', 'int'): ["int", "#push_plus"],
     ('TypeSpecifier', 'void'): ["void", "#push_minus"],
@@ -54,8 +55,8 @@ parse_table = {
     ('ParamList', ','): [",", "Param", "ParamList"],
     ('ParamList', 'ε'): ["ε"],
 
-    ('Param', 'int'): ["DeclarationInitial", "ParamPrime"],
-    ('Param', 'void'): ["DeclarationInitial", "ParamPrime"],
+    ('Param', 'int'): ["DeclarationInitial", "#int_input_var", "ParamPrime"],
+    ('Param', 'void'): ["DeclarationInitial", "#void_input_var", "ParamPrime"],
 
     ('ParamPrime', '['): ["[", "]"],
     ('ParamPrime', 'ε'): ["ε"],
@@ -234,7 +235,7 @@ parse_table = {
     ('VarPrime', '['): ["[", "Expression", "]", "#fix_address_of_array"],
     ('VarPrime', 'ε'): ["ε"],
 
-    ('FactorPrime', '('): ["(", "Args", "#output", ")"],
+    ('FactorPrime', '('): ["(", "#push_func_sign", "Args", ")", "#function_call"],
     ('FactorPrime', 'ε'): ["ε"],
 
     ('FactorZegond', '('): ["(", "Expression", ")"],
@@ -647,6 +648,9 @@ def findadrr(var_name):
     return a
 
 
+ra = []
+
+
 class FunctionDec:
     def __init__(self, name, address, return_val, start):
         self.name = name
@@ -683,7 +687,7 @@ class SemanticStack:
 class CodeGen:
     def __init__(self):
         self.pb = [''] * 10000
-        self.i = 0
+        self.i = 1
         self.ss = SemanticStack()
 
     def generate(self, action, input_var):
@@ -699,6 +703,10 @@ class CodeGen:
     def push_func_sign(self, *args):
         self.ss.push("f")
 
+    def function_return(self, *args):
+        # todo jp @tmp, handle main
+        pass
+
     def function_call(self, *args):
         i = 1
         param_list = []
@@ -707,7 +715,42 @@ class CodeGen:
             i += 1
         self.ss.pop(i)
 
-        # todo ss.top() is the name of func
+        address = self.ss.top()
+        values = list(symbol_table.values())
+        name = ""
+        for i in range(0, len(values)):
+            if address == values[i]['address']:
+                name = values[i]['token']
+                break
+
+        if name == "output":
+            self.ss.push(param_list[0])
+            self.output()
+            return
+
+        called_function = None
+        for func in function_names:
+            if func.name == name:
+                called_function = func
+
+        param_size = len(param_list)
+        for index in range(param_size):
+            self.ss.push(called_function.param_list[index][0])
+            self.ss.push(param_list[param_size - index - 1])
+            self.assign()
+        '''
+        dd ->
+        ra = [y]
+        assign tmp x1
+        jp sort
+        aasign tmp y
+        
+        '''
+        # todo assign temp self.i + 2
+        ra.append(self.i + 1)
+        self.pb[self.i] = f'(JP, {called_function.start}, ,)'
+        self.i += 1
+        # todo assign temp ra.pop(2)
 
     def var_dec(self, *args):
         self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top()},)'
@@ -857,6 +900,10 @@ class CodeGen:
         return_val = "void"
         if self.ss.top(2) == 1:
             return_val = "int"
+
+        if name == main_faction_name:
+            self.pb[0] = f'(JP, {self.i}, ,)'
+
         f = FunctionDec(name, address, return_val, self.i)
         self.ss.pop(2)
         function_names.append(f)
@@ -872,7 +919,7 @@ class CodeGen:
 
     def return_val(self, *args):
         function_names[-1].set_return_val_add(self.ss.top())
-        self.ss.pop(1)
+        # self.ss.pop(1) todo
 
     def output(self, *args):
         self.pb[self.i] = f'(PRINT, {self.ss.top()}, ,)'
