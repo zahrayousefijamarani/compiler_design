@@ -16,7 +16,7 @@ whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
 scope = 0
 function_names = []
 data_index = 100
-temp_index = 1000
+temp_index = 1004
 main_faction_name = "main"
 
 parse_table = {
@@ -104,14 +104,14 @@ parse_table = {
     ('IterationStmt', 'while'): ["while", "(", "#label", "Expression", "#save",
                                  ")", "Statement", "#while_sym"],
 
-    ('ReturnStmt', 'return'): ["return", "ReturnStmtPrime"],
+    ('ReturnStmt', 'return'): ["return", "ReturnStmtPrime", "#function_return"],
 
     ('ReturnStmtPrime', ';'): [";"],
     ('ReturnStmtPrime', 'ID'): ["Expression", "#return_val", ";"],
     ('ReturnStmtPrime', '+'): ["Expression", "#return_val", ";"],
     ('ReturnStmtPrime', '-'): ["Expression", "#return_val", ";"],
     ('ReturnStmtPrime', '('): ["Expression", "#return_val", ";"],
-    ('ReturnStmtPrime', 'NUM'): ["Expression", "#return_val", ";"],
+    ('ReturnStmtPrime', 'NUM'): ["Expression", "#save_temp", "#return_val", ";"],
 
     ('SwitchStmt', 'switch'): ["switch", "#tmp_save", "(", "Expression", ")", "{",
                                "CaseStmts", "DefaultStmt", " #jp_switch", "}"],
@@ -704,8 +704,8 @@ class CodeGen:
         self.ss.push("f")
 
     def function_return(self, *args):
-        # todo jp @tmp, handle main
-        pass
+        if function_names[-1].name != "main":
+            self.pb[self.i] = f'(JP, @1000, ,)'
 
     def function_call(self, *args):
         i = 1
@@ -738,19 +738,19 @@ class CodeGen:
             self.ss.push(called_function.param_list[index][0])
             self.ss.push(param_list[param_size - index - 1])
             self.assign()
-        '''
-        dd ->
-        ra = [y]
-        assign tmp x1
-        jp sort
-        aasign tmp y
-        
-        '''
-        # todo assign temp self.i + 2
+            self.ss.pop()
+
+        self.pb[self.i] = f'(ASSIGN, {self.i + 2}, 1000,)'
+        self.i += 1
         ra.append(self.i + 1)
         self.pb[self.i] = f'(JP, {called_function.start}, ,)'
         self.i += 1
-        # todo assign temp ra.pop(2)
+        if 2 <= len(ra):
+            ra.pop()
+            self.pb[self.i] = f'(ASSIGN, {ra.pop()}, 1000,)'
+            self.i += 1
+        elif len(ra) == 1:
+            ra.pop()
 
     def var_dec(self, *args):
         self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top()},)'
@@ -759,6 +759,13 @@ class CodeGen:
 
     def pnum(self, var, *args):
         self.ss.push(f'#{var}')
+
+    def save_temp(self, *args):
+        t = get_temp_var()
+        self.pb[self.i] = f'(ASSIGN, {self.ss.top()}, {t},)'
+        self.i += 1
+        self.ss.pop(1)
+        self.ss.push(t)
 
     def array_dec(self, *args):
         global data_index
