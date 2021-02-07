@@ -16,7 +16,7 @@ whitespaces = [' ', '\n', '\r', '\t', '\v', '\f']
 scope = 0
 function_names = []
 data_index = 100
-temp_index = 1004
+temp_index = 1008
 main_faction_name = "main"
 
 parse_table = {
@@ -651,6 +651,12 @@ def findadrr(var_name):
 ra = []
 
 
+class ReturnClass:
+    def __init__(self, return_value, return_address):
+        self.return_value = return_value
+        self.return_address = return_address
+
+
 class FunctionDec:
     def __init__(self, name, address, return_val, start):
         self.name = name
@@ -706,6 +712,7 @@ class CodeGen:
     def function_return(self, *args):
         if function_names[-1].name != "main":
             self.pb[self.i] = f'(JP, @1000, ,)'
+            self.i += 1
 
     def function_call(self, *args):
         i = 1
@@ -742,12 +749,14 @@ class CodeGen:
 
         self.pb[self.i] = f'(ASSIGN, {self.i + 2}, 1000,)'
         self.i += 1
-        ra.append(self.i + 1)
+        ra.append(ReturnClass(0, self.i + 1))
         self.pb[self.i] = f'(JP, {called_function.start}, ,)'
         self.i += 1
         if 2 <= len(ra):
             ra.pop()
-            self.pb[self.i] = f'(ASSIGN, {ra.pop()}, 1000,)'
+            val = ra.pop()
+            self.pb[self.i] = f'(ASSIGN, {val[1]}, 1000,)'
+            self.ss.push(1004)
             self.i += 1
         elif len(ra) == 1:
             ra.pop()
@@ -925,8 +934,11 @@ class CodeGen:
         self.ss.pop(1)
 
     def return_val(self, *args):
-        function_names[-1].set_return_val_add(self.ss.top())
-        # self.ss.pop(1) todo
+        a = self.ss.top()
+        function_names[-1].set_return_val_add(a)
+        self.ss.pop(1)  # todo
+        self.pb[self.i] = f'(ASSIGN, {a}, 1004,)'
+        self.i += 1
 
     def output(self, *args):
         self.pb[self.i] = f'(PRINT, {self.ss.top()}, ,)'
