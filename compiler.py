@@ -114,7 +114,7 @@ parse_table = {
     ('ReturnStmtPrime', 'NUM'): ["Expression", "#save_temp", "#return_val", ";"],
 
     ('SwitchStmt', 'switch'): ["switch", "#tmp_save", "(", "Expression", ")", "{",
-                               "CaseStmts", "DefaultStmt", " #jp_switch", "}"],
+                               "CaseStmts", "DefaultStmt", "#jp_switch", "}"],
 
     ('CaseStmts', 'ε'): ["ε"],
     ('CaseStmts', 'case'): ["CaseStmt", "CaseStmts"],
@@ -878,19 +878,20 @@ class CodeGen:
         self.ss.pop()
         self.ss.push(t)
 
-    def temp_save(self, *args):
+    def tmp_save(self, *args):
         self.pb[self.i] = f'(JP, {self.i + 2}, , )'
         self.i += 1
         self.ss.push(self.i)
         self.i += 1
 
     def jp_switch(self, *args):
+        self.ss.pop()
         self.pb[self.ss.top()] = f'(JP, {self.i}, , )'
-        self.ss.pop(2)
+        self.ss.pop()
 
     def cmp_save(self, *args):
         t = get_temp_var()
-        self.pb[self.i] = f'(EQ, #{self.ss.top()}, {self.ss.top(2)}, {t})'
+        self.pb[self.i] = f'(EQ, {self.ss.top()}, {self.ss.top(2)}, {t})'
         self.i += 1
         self.ss.pop(1)
         self.ss.push(t)
