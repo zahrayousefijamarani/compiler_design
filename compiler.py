@@ -753,6 +753,9 @@ class CodeGen:
         ra.append(ReturnClass(0, self.i + 1))
         self.pb[self.i] = f'(JP, {called_function.start}, ,)'
         self.i += 1
+        t1 = get_temp_var()
+        self.pb[self.i] = f'(ASSIGN, 1004, {t1},)'
+        self.i += 1
         if 2 <= len(ra):
             ra.pop()
             val = ra.pop()
@@ -760,7 +763,7 @@ class CodeGen:
             self.i += 1
         elif len(ra) == 1:
             ra.pop()
-        self.ss.push(1004)
+        self.ss.push(t1)
 
     def var_dec(self, *args):
         self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top()},)'
