@@ -833,7 +833,10 @@ class CodeGen:
 
     def fix_address_of_array(self, *args):
         t = get_temp_var()
-        self.pb[self.i] = f'(ADD, #{self.ss.top(2)}, {self.ss.top()}, {t})'
+        t2 = get_temp_var()
+        self.pb[self.i] = f'(MULT, {self.ss.top()}, #4, {t2})'
+        self.i += 1
+        self.pb[self.i] = f'(ADD, #{self.ss.top(2)}, {t2}, {t})'
         self.i += 1
         self.ss.pop(2)
         self.ss.push(f'@{t}')
@@ -906,7 +909,7 @@ class CodeGen:
         self.ss.pop(2)
 
     def jp_break(self, *args):
-        self.pb[self.i] = f'(JP, {self.ss.top(4)}, , )'
+        self.pb[self.i] = f'(JP, {self.ss.top(3)}, , )'
         self.i += 1
 
     def function_dec(self, *args):
