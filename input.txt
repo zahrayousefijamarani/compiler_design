@@ -1,31 +1,39 @@
-/*===  Sample 5  === */
-void printArray(int A[], int size)
-{
-    int i;
-    i = 0;
-    while(i < size){
-        output(A[i]);
-        i = i + 1;
-    }
+/* === sample 9 ==== */
+int x[10];
+int minloc (  int a[],  int low,  int high 	)
+    {int i; int x;  int k;
+      k = low;
+      x = a[low];
+      i = low + 1;
+      while (i < high)
+          { if (a[i] < x)
+             { x= a[i];
+               k =  i; } else { }
+              i =  i + 1;
+           }
+            return k;
 }
-
+void sort( int a[], int low, int high)
+   { int i; int k;
+     i = low;
+     while (i < high-1)
+        { int  t;
+          k = minloc(a,i,high);
+          t = a[k];
+          a[k] = a[i];
+          a[i] =  t;
+          i = i+1;
+           }
+      }
 void main(void)
-{
-    int arr[20];
-    int arrsize;
-    int i;
-    int j;
-    arrsize = 20;
-    i = 0;
-    while(i < arrsize){
-	j = 0;
-	arr[i] = 2;
-	while (j < i) {
-		arr[i] = arr[i] * -2;
-		j = j + 1;
-	}
-	i = i + 1;
-    }
-
-    printArray(arr, arrsize);
-}
+     {  int i;
+       i = 0;
+       while (i < 10)
+         { x[i] =  i * i;
+           i = i + 1; }
+           sort(x,0,10);
+           i = 0;
+           while (i < 10)
+              { output(x[i]);
+               i = i + 1;}
+     }
