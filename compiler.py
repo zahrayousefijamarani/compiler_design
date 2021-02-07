@@ -735,6 +735,7 @@ class CodeGen:
             self.output()
             return
 
+        self.ss.pop()
         called_function = None
         for func in function_names:
             if func.name == name:
@@ -756,10 +757,10 @@ class CodeGen:
             ra.pop()
             val = ra.pop()
             self.pb[self.i] = f'(ASSIGN, {val[1]}, 1000,)'
-            self.ss.push(1004)
             self.i += 1
         elif len(ra) == 1:
             ra.pop()
+        self.ss.push(1004)
 
     def var_dec(self, *args):
         self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top()},)'
