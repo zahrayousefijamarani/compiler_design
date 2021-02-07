@@ -742,9 +742,9 @@ class CodeGen:
                 called_function = func
 
         param_size = len(param_list)
-        for index in range(param_size):
+        for index in range(0, param_size):
             self.ss.push(called_function.param_list[index][0])
-            self.ss.push(param_list[param_size - index - 1])
+            self.ss.push(param_list[index])
             self.assign()
             self.ss.pop()
 
