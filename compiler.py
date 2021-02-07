@@ -748,7 +748,7 @@ class CodeGen:
             self.assign()
             self.ss.pop()
 
-        self.pb[self.i] = f'(ASSIGN, {self.i + 2}, 1000,)'
+        self.pb[self.i] = f'(ASSIGN, #{self.i + 2}, 1000,)'
         self.i += 1
         ra.append(ReturnClass(0, self.i + 1))
         self.pb[self.i] = f'(JP, {called_function.start}, ,)'
@@ -756,7 +756,7 @@ class CodeGen:
         if 2 <= len(ra):
             ra.pop()
             val = ra.pop()
-            self.pb[self.i] = f'(ASSIGN, {val[1]}, 1000,)'
+            self.pb[self.i] = f'(ASSIGN, #{val[1]}, 1000,)'
             self.i += 1
         elif len(ra) == 1:
             ra.pop()
