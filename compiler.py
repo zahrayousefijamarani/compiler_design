@@ -744,10 +744,7 @@ class CodeGen:
         param_size = len(param_list)
         for index in range(0, param_size):
             self.ss.push(called_function.param_list[index][0])
-            if called_function.param_list[index][1] == "array":
-                self.ss.push('#' + str(param_list[index]))
-            else:
-                self.ss.push(str(param_list[index]))
+            self.ss.push(str(param_list[index]))
             self.assign()
             self.ss.pop()
 
@@ -788,10 +785,13 @@ class CodeGen:
         s = self.ss.top()
         if '#' in s:
             s = int(s[1:])
+            
+        self.pb[self.i] = f'(ASSIGN, #{self.ss.top(2) + 4}, {self.ss.top(2)})' 
+        self.i += 1
         for i in range(int(s)):
-            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + i * 4})'  # !!!size of word
+            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + (i+1) * 4})'  # !!!size of word
             self.i += 1
-        data_index += (s - 1) * 4
+        data_index += (s) * 4
         self.ss.pop(3)  # todo
 
     def push_plus(self, *args):
@@ -839,7 +839,7 @@ class CodeGen:
         t2 = get_temp_var()
         self.pb[self.i] = f'(MULT, {self.ss.top()}, #4, {t2})'
         self.i += 1
-        self.pb[self.i] = f'(ADD, #{self.ss.top(2)}, {t2}, {t})'
+        self.pb[self.i] = f'(ADD, {self.ss.top(2)}, {t2}, {t})'
         self.i += 1
         self.ss.pop(2)
         self.ss.push(f'@{t}')
