@@ -18,6 +18,7 @@ function_names = []
 data_index = 100
 temp_index = 1008
 main_faction_name = "main"
+first_func = None
 
 parse_table = {
     ('Program', '$'): ["$"],
@@ -693,7 +694,7 @@ class SemanticStack:
 class CodeGen:
     def __init__(self):
         self.pb = [''] * 10000
-        self.i = 1
+        self.i = 0
         self.ss = SemanticStack()
 
     def generate(self, action, input_var):
@@ -786,10 +787,10 @@ class CodeGen:
         if '#' in s:
             s = int(s[1:])
             
-        self.pb[self.i] = f'(ASSIGN, #{self.ss.top(2) + 4}, {self.ss.top(2)})' 
+        self.pb[self.i] = f'(ASSIGN, #{self.ss.top(2) + 4}, {self.ss.top(2)},)' 
         self.i += 1
         for i in range(int(s)):
-            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + (i+1) * 4})'  # !!!size of word
+            self.pb[self.i] = f'(ASSIGN, #0, {self.ss.top(2) + (i+1) * 4},)'  # !!!size of word
             self.i += 1
         data_index += (s) * 4
         self.ss.pop(3)  # todo
@@ -927,9 +928,13 @@ class CodeGen:
         return_val = "void"
         if self.ss.top(2) == 1:
             return_val = "int"
-
+         
+        if not(first_func is None):
+          first_func = self.i
+          self.i += 1
+        
         if name == main_faction_name:
-            self.pb[0] = f'(JP, {self.i}, ,)'
+            self.pb[start_func] = f'(JP, {self.i}, ,)'
 
         f = FunctionDec(name, address, return_val, self.i)
         self.ss.pop(2)
