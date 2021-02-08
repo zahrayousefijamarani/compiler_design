@@ -743,11 +743,11 @@ class CodeGen:
 
         param_size = len(param_list)
         for index in range(0, param_size):
-            if called_function.param_list[index][1]== "array":
-               self.ss.push("#" + called_function.param_list[index][0])
+            self.ss.push(called_function.param_list[index][0])
+            if called_function.param_list[index][1] == "array":
+                self.ss.push('#' + str(param_list[index]))
             else:
-              self.ss.push(called_function.param_list[index][0])
-            self.ss.push(param_list[index])
+                self.ss.push(str(param_list[index]))
             self.assign()
             self.ss.pop()
 
@@ -943,9 +943,9 @@ class CodeGen:
     def int_input_var(self, *args):
         function_names[-1].add_param((self.ss.top(), "int"))
         self.ss.pop(1)
-    
+
     def set_as_array(self, *args):
-        function_names[-1][-1][1] = "array"
+        function_names[-1].param_list[-1] = (function_names[-1].param_list[-1][0], 'array')
 
     def return_val(self, *args):
         a = self.ss.top()
