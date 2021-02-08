@@ -836,10 +836,7 @@ class CodeGen:
 
     def fix_address_of_array(self, *args):
         t = get_temp_var()
-        t2 = get_temp_var()
-        self.pb[self.i] = f'(MULT, {self.ss.top()}, #4, {t2})'
-        self.i += 1
-        self.pb[self.i] = f'(ADD, {self.ss.top(2)}, {t2}, {t})'
+        self.pb[self.i] = f'(ADD, #{self.ss.top(2)}, {self.ss.top()}, {t})'
         self.i += 1
         self.ss.pop(2)
         self.ss.push(f'@{t}')
